@@ -6,7 +6,9 @@
   "main": "agent.mjs",
   "scripts": {
     "start": "node --env-file=.env agent.mjs",
-    "dev": "node agent.mjs"
+    "dev": "node agent.mjs",
+    "test": "node agent.mjs --test",
+    "push": "git add . && git commit -m \"Update AI Agent\" && git push origin main"
   },
   "keywords": ["ai-agent", "gemini", "free", "autonomous", "tools"],
   "author": "",

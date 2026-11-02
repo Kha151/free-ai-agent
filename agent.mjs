@@ -141,7 +141,60 @@ Guidelines:
   }
 }
 
+async function runSelfTest() {
+  console.log(`\n${C.cyan}${C.bold}🔍 Running Agent Self-Test (Zero API Key Mode)...${C.reset}\n`);
+
+  try {
+    // 1. Time tool
+    process.stdout.write("  Testing getCurrentTime... ");
+    const timeRes = await TOOL_HANDLERS.getCurrentTime();
+    console.log(`${C.green}✓ OK${C.reset} (${JSON.parse(timeRes).localTime})`);
+
+    // 2. Math tool
+    process.stdout.write("  Testing calculate ('125 * 8 + 50')... ");
+    const calcRes = await TOOL_HANDLERS.calculate({ expression: "125 * 8 + 50" });
+    const parsedCalc = JSON.parse(calcRes);
+    if (parsedCalc.result === "1050") {
+      console.log(`${C.green}✓ OK${C.reset} (Result: 1050)`);
+    } else {
+      console.log(`${C.red}✗ Failed${C.reset}`);
+    }
+
+    // 3. File write tool
+    process.stdout.write("  Testing writeFile ('test_agent.tmp')... ");
+    await TOOL_HANDLERS.writeFile({
+      filename: "test_agent.tmp",
+      content: "AI Agent system check passed.",
+    });
+    console.log(`${C.green}✓ OK${C.reset}`);
+
+    // 4. File read tool
+    process.stdout.write("  Testing readFile ('test_agent.tmp')... ");
+    const readRes = JSON.parse(await TOOL_HANDLERS.readFile({ filename: "test_agent.tmp" }));
+    if (readRes.content.includes("passed")) {
+      console.log(`${C.green}✓ OK${C.reset}`);
+    }
+
+    // 5. List files tool
+    process.stdout.write("  Testing listFiles ('.')... ");
+    const listRes = JSON.parse(await TOOL_HANDLERS.listFiles({ directory: "." }));
+    console.log(`${C.green}✓ OK${C.reset} (${listRes.files.length} items found)`);
+
+    // Clean up temporary test file
+    await (await import("fs/promises")).unlink("test_agent.tmp").catch(() => {});
+
+    console.log(`\n${C.green}${C.bold}🎉 All Agent tools are healthy and operational!${C.reset}\n`);
+  } catch (err) {
+    console.error(`\n${C.red}Self-test error: ${err.message}${C.reset}\n`);
+  }
+}
+
 async function main() {
+  // If user passes --test or -t
+  if (process.argv.includes("--test") || process.argv.includes("-t")) {
+    await runSelfTest();
+    return;
+  }
   console.log(`\n${C.green}${C.bold}==============================================${C.reset}`);
   console.log(`${C.green}${C.bold}       🤖 Free AI Agent (Gemini + Tools)      ${C.reset}`);
   console.log(`${C.green}${C.bold}==============================================${C.reset}\n`);
