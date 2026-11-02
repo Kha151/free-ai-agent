@@ -57,11 +57,15 @@ npm test
 
 ---
 
-## 🛠️ Danh Sách Công Cụ Tự Động:
-1. `listCurriculumTracks`: Xem danh sách tất cả các lộ trình bài học.
-2. `getCurriculumLesson`: Tải chi tiết bài học lý thuyết và lab thực hành an toàn.
-3. `auditCodeSnippet`: Tự động rà soát mã nguồn hoặc Dockerfile, chỉ ra lỗ hổng CWE và cách chặn trong CI/CD.
-4. `searchWeb`: Tra cứu kiến thức an ninh mạng và cơ sở dữ liệu CVE.
-5. `calculate`: Máy tính biểu thức số học an toàn.
-6. `writeFile` & `readFile`: Ghi chép tài liệu học tập vào máy tính.
-7. `listFiles` & `getCurrentTime`: Kiểm tra file và thời gian hệ thống.
+## 🛠️ Danh Sách Công Cụ Tự Động Tích Hợp:
+1. **`runGitleaksScan`**: Tự động quét repository/thư mục phát hiện rò rỉ API key, private key, secret và token bị bỏ quên trong Git.
+2. **`runSemgrepScan`**: Quét mã tĩnh SAST phát hiện các lỗ hổng OWASP Top 10 (SQLi, Command Injection, Insecure Deserialization, Path Traversal) trên code hoặc file.
+3. **`runTrivyScan`**: Quét lỗ hổng bảo mật CVE trong thư viện (`package.json`) và rà soát cấu hình Dockerfile (chạy root, tag `:latest`).
+4. **`runNmapScan`**: Quét cổng và dịch vụ mạng trên các mục tiêu Lab hợp pháp (`localhost`, `127.0.0.1`, `scanme.nmap.org`), giải thích cờ lệnh và cách cấu hình firewall phòng thủ.
+5. `listCurriculumTracks`: Xem danh sách tất cả các lộ trình bài học Pentest & DevSecOps.
+6. `getCurriculumLesson`: Tải chi tiết bài học lý thuyết và lab thực hành an toàn.
+7. `auditCodeSnippet`: Tự động rà soát nhanh mã nguồn hoặc Dockerfile.
+8. `searchWeb`: Tra cứu kiến thức an ninh mạng và cơ sở dữ liệu CVE.
+9. `calculate`: Máy tính biểu thức số học an toàn.
+10. `writeFile` & `readFile`: Ghi chép tài liệu học tập vào máy tính.
+11. `listFiles` & `getCurrentTime`: Kiểm tra file và thời gian hệ thống.

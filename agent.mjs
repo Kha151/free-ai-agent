@@ -235,6 +235,26 @@ async function runSelfTest() {
     const auditRes = JSON.parse(await TOOL_HANDLERS.auditCodeSnippet({ code: "FROM alpine:latest\nUSER root", language: "dockerfile" }));
     console.log(`${C.green}✓ OK${C.reset} (${auditRes.findingsCount} findings detected)`);
 
+    // 9. Gitleaks tool
+    process.stdout.write("  Testing runGitleaksScan... ");
+    const gitleaksRes = JSON.parse(await TOOL_HANDLERS.runGitleaksScan({ targetPath: "." }));
+    console.log(`${C.green}✓ OK${C.reset} (${gitleaksRes.engine})`);
+
+    // 10. Semgrep SAST tool
+    process.stdout.write("  Testing runSemgrepScan (Command Injection check)... ");
+    const semgrepRes = JSON.parse(await TOOL_HANDLERS.runSemgrepScan({ codeSnippet: "import os\nos.system('ping ' + ip)" }));
+    console.log(`${C.green}✓ OK${C.reset} (${semgrepRes.totalFindings} findings detected)`);
+
+    // 11. Trivy SCA tool
+    process.stdout.write("  Testing runTrivyScan... ");
+    const trivyRes = JSON.parse(await TOOL_HANDLERS.runTrivyScan({ target: "." }));
+    console.log(`${C.green}✓ OK${C.reset} (${trivyRes.engine})`);
+
+    // 12. Nmap tool
+    process.stdout.write("  Testing runNmapScan (127.0.0.1)... ");
+    const nmapRes = JSON.parse(await TOOL_HANDLERS.runNmapScan({ targetHost: "127.0.0.1", ports: "80,443" }));
+    console.log(`${C.green}✓ OK${C.reset} (${nmapRes.engine})`);
+
     // Clean up temporary test file
     await (await import("fs/promises")).unlink("test_agent.tmp").catch(() => {});
 

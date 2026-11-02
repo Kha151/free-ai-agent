@@ -1,6 +1,12 @@
 import fs from "fs/promises";
 import path from "path";
 import { CURRICULUM } from "./curriculum.mjs";
+import {
+  runGitleaksScan,
+  runSemgrepScan,
+  runTrivyScan,
+  runNmapScan,
+} from "./securityTools.mjs";
 
 /**
  * Tool 1: Safe Math Calculator
@@ -331,6 +337,50 @@ export const TOOL_DECLARATIONS = [
       },
       required: ["code"]
     }
+  },
+  {
+    name: "runGitleaksScan",
+    description: "Runs Gitleaks secret scanner on a target folder/repo to find leaked API keys, tokens, and hardcoded passwords.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        targetPath: { type: "STRING", description: "Relative directory path to scan (defaults to .)" }
+      }
+    }
+  },
+  {
+    name: "runSemgrepScan",
+    description: "Runs Semgrep Static Application Security Testing (SAST) on files or code snippet to detect OWASP Top 10 flaws (Command Injection, SQLi, Insecure Deserialization).",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        targetPath: { type: "STRING", description: "Path to file or directory to scan" },
+        codeSnippet: { type: "STRING", description: "Raw code string to analyze directly" }
+      }
+    }
+  },
+  {
+    name: "runTrivyScan",
+    description: "Runs Trivy vulnerability scanner on dependencies (package.json) or container configuration (Dockerfile) to detect known CVEs and misconfigurations.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        target: { type: "STRING", description: "Target file or directory (e.g. . or Dockerfile)" },
+        targetType: { type: "STRING", description: "Scan type: 'fs' for filesystem, 'config' for IaC/Dockerfile" }
+      }
+    }
+  },
+  {
+    name: "runNmapScan",
+    description: "Runs Nmap network and port scan on authorized lab targets (localhost, 127.0.0.1, scanme.nmap.org) and explains services and defensive mitigations.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        targetHost: { type: "STRING", description: "Authorized target host (e.g. 127.0.0.1 or scanme.nmap.org)" },
+        ports: { type: "STRING", description: "Comma-separated ports (e.g. '80,443,8080,22,3000')" },
+        flags: { type: "STRING", description: "Nmap scan flags (e.g. '-sV' for version detection)" }
+      }
+    }
   }
 ];
 
@@ -344,6 +394,10 @@ export const TOOL_HANDLERS = {
   getCurrentTime,
   listCurriculumTracks,
   getCurriculumLesson,
-  auditCodeSnippet
+  auditCodeSnippet,
+  runGitleaksScan,
+  runSemgrepScan,
+  runTrivyScan,
+  runNmapScan,
 };
 
