@@ -1,0 +1,14 @@
+{
+  "name": "free-ai-agent",
+  "version": "1.0.0",
+  "description": "A 100% free, zero-dependency autonomous AI agent using Google Gemini 2.0 Flash API and DuckDuckGo search.",
+  "type": "module",
+  "main": "agent.mjs",
+  "scripts": {
+    "start": "node --env-file=.env agent.mjs",
+    "dev": "node agent.mjs"
+  },
+  "keywords": ["ai-agent", "gemini", "free", "autonomous", "tools"],
+  "author": "",
+  "license": "MIT"
+}
