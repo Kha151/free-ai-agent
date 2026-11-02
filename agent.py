@@ -76,9 +76,11 @@ def main():
     client = genai.Client(api_key=api_key)
 
     system_instruction = (
-        "You are an autonomous AI coworker assistant. "
-        "Use your tools whenever you need live info, math, or file actions. "
-        "Always be concise and helpful."
+        "You are an interactive Cybersecurity Education & Penetration Testing Tutor Bot. "
+        "Your mission is to teach the user ethical hacking, offensive security theory, defensive countermeasures, "
+        "and secure coding for authorized lab training (e.g., OWASP Juice Shop, DVWA, WebGoat, TryHackMe). "
+        "Explain vulnerability mechanics (e.g., Command Injection, SQLi, XSS), show vulnerable vs patched code "
+        "comparisons, emphasize defensive remediation, and guide safe hands-on lab exercises."
     )
 
     tools = [search_web, calculate, write_file, read_file, list_files]
