@@ -28,16 +28,30 @@ class AIAgent {
     this.systemInstruction = {
       parts: [
         {
-          text: `You are an interactive Cybersecurity Education & Penetration Testing Tutor Bot.
-Your mission is to teach the user ethical hacking, offensive security theory, defensive countermeasures, and secure application development for authorized lab training (e.g., OWASP Juice Shop, DVWA, WebGoat, TryHackMe, PortSwigger Academy).
+          text: `You are an interactive, expert Penetration Testing & DevSecOps Tutor Bot.
+Your goal is to train the user to become proficient in both Offensive Security (Ethical Hacking / Pentesting) and Defensive Automation (DevOps & DevSecOps).
 
-Teaching Methodology:
-1. Explain Vulnerability Mechanics: Break down how security flaws (such as OWASP Top 10, Command Injection, SQL Injection, XSS, SSRF, IDOR, Authentication Bypasses) occur at the architectural and code levels.
-2. Abstract Code Comparison: Present simplified, abstract code snippets contrasting vulnerable patterns with secure, hardened code (e.g., using parameterized APIs, allowlisting, input validation, defense-in-depth).
-3. Penetration Testing Frameworks: Teach standardized assessment methodology (PTES, OWASP WSTG, NIST SP 800-115) across Reconnaissance, Threat Modeling, Vulnerability Analysis, Exploitation Theory, and Reporting.
-4. Remediation & Defense First: Always provide robust defensive mitigations, patch examples, and security best practices alongside concepts.
-5. Interactive Learning: Offer step-by-step learning modules, quizzes, and safe lab scenario suggestions to help the user master practical cybersecurity concepts.
-6. Tools: Use your tools (searchWeb, calculate, writeFile, readFile, listFiles, getCurrentTime) to look up security references, CVE databases, write study guides, or format lesson notes.`,
+Core Pillars You Teach:
+1. Penetration Testing (Offensive Lens):
+   - Reconnaissance, Threat Modeling, Web Vulnerabilities (OWASP Top 10, SQLi, Command Injection, XSS, SSRF, IDOR).
+   - Privilege Escalation fundamentals and standardized methodologies (PTES, OWASP WSTG, NIST SP 800-115).
+   - Safe hands-on labs (PortSwigger Web Security Academy, OWASP Juice Shop, DVWA, TryHackMe).
+
+2. DevSecOps & CI/CD Security (Defensive & Automation Lens):
+   - Shift-Left Philosophy: Catching flaws early in Git pre-commit hooks and CI/CD pipelines (GitHub Actions, GitLab CI).
+   - Automated Scanners: Secret Scanning (Gitleaks/Trufflehog), SAST (Semgrep/SonarQube), SCA (Trivy/Snyk), DAST (OWASP ZAP).
+   - Container & Cloud Hardening: Non-root Dockerfiles, minimal base images, CIS benchmarks, Kubernetes admission policies (OPA/Kyverno), and IaC scanning (Checkov/tfsec).
+
+3. Dual-Perspective Pedagogy:
+   - For every vulnerability, explain both:
+     a) How a penetration tester discovers and validates the flaw.
+     b) How a DevSecOps engineer writes an automated pipeline test/gate or code patch to eliminate it permanently.
+
+4. Tools at your disposal:
+   - listCurriculumTracks: View available learning tracks.
+   - getCurriculumLesson: Fetch syllabus modules (e.g., pt-101, pt-102, secops-201, secops-202, cloud-301).
+   - auditCodeSnippet: Perform static vulnerability and DevSecOps checks on code/Dockerfiles.
+   - searchWeb, writeFile, readFile, listFiles, calculate.`,
         },
       ],
     };
@@ -201,6 +215,21 @@ async function runSelfTest() {
     const listRes = JSON.parse(await TOOL_HANDLERS.listFiles({ directory: "." }));
     console.log(`${C.green}✓ OK${C.reset} (${listRes.files.length} items found)`);
 
+    // 6. Pentest & DevSecOps curriculum tool
+    process.stdout.write("  Testing listCurriculumTracks... ");
+    const tracksRes = JSON.parse(await TOOL_HANDLERS.listCurriculumTracks());
+    console.log(`${C.green}✓ OK${C.reset} (${tracksRes.tracks.length} tracks loaded)`);
+
+    // 7. Get Lesson tool
+    process.stdout.write("  Testing getCurriculumLesson ('secops-201')... ");
+    const lessonRes = JSON.parse(await TOOL_HANDLERS.getCurriculumLesson({ moduleId: "secops-201" }));
+    console.log(`${C.green}✓ OK${C.reset} (${lessonRes.module})`);
+
+    // 8. Code Audit tool
+    process.stdout.write("  Testing auditCodeSnippet (Docker root check)... ");
+    const auditRes = JSON.parse(await TOOL_HANDLERS.auditCodeSnippet({ code: "FROM alpine:latest\nUSER root", language: "dockerfile" }));
+    console.log(`${C.green}✓ OK${C.reset} (${auditRes.findingsCount} findings detected)`);
+
     // Clean up temporary test file
     await (await import("fs/promises")).unlink("test_agent.tmp").catch(() => {});
 
@@ -217,7 +246,7 @@ async function main() {
     return;
   }
   console.log(`\n${C.green}${C.bold}==============================================${C.reset}`);
-  console.log(`${C.green}${C.bold}   🛡️  Pentest & Cybersecurity Tutor Bot     ${C.reset}`);
+  console.log(`${C.green}${C.bold}   🛡️  Pentest & DevSecOps Master Tutor Bot  ${C.reset}`);
   console.log(`${C.green}${C.bold}==============================================${C.reset}\n`);
 
   let apiKey = process.env.GEMINI_API_KEY;

@@ -1,62 +1,67 @@
-# 🤖 Free Autonomous AI Agent
+# 🛡️ Free Pentest & DevSecOps Master Tutor Bot
 
-A 100% free autonomous AI agent that you can code, customize, and run locally.
+An autonomous, 100% free AI agent that trains you in both **Penetration Testing (Ethical Hacking)** and **DevSecOps (Automated CI/CD Security)**.
 
-- **Zero cost**: Uses Google Gemini 2.0 Flash's free tier (1,500 requests/day, no credit card needed).
-- **Zero dependencies needed for Node.js**: Built with native Node.js 24 (`fetch`, `fs`, `readline`). Works right out of the box.
-- **Built-in tools**:
-  1. `searchWeb`: Free web searches via DuckDuckGo (no search API keys needed).
-  2. `calculate`: Safe math evaluator.
-  3. `writeFile`: Saves text and reports to files locally.
-  4. `readFile`: Reads files in the workspace.
-  5. `listFiles`: Lists workspace files.
-  6. `getCurrentTime`: Formats date and time.
-- **Python alternative included**: Also includes `agent.py` if you prefer Python.
+- **Dual-Perspective Pedagogy**:
+  - *Offensive Lens (Pentesting)*: Understand how attackers exploit vulnerabilities, perform reconnaissance, and escalate privileges.
+  - *Defensive Lens (DevSecOps)*: Learn how to "Shift Left" and build automated security guardrails (SAST, SCA, DAST, Secret Scanning, Container Hardening) into CI/CD pipelines.
+- **Embedded Curriculum**: Structured tracks with hands-on lab exercises (OWASP Juice Shop, DVWA, PortSwigger Web Security Academy, TryHackMe).
+- **Automated Security Tools**: Built-in static code & Dockerfile security auditor, curriculum guide, DuckDuckGo/Wikipedia knowledge base, and math calculator.
+- **Zero Cost**: Runs on Google Gemini API free tier (1,500 requests/day).
 
 ---
 
-## 🚀 Quick Start (Node.js - Ready immediately)
+## 📚 Curriculum Tracks
 
-### 1. Get your free Gemini API Key
-1. Go to [Google AI Studio](https://aistudio.google.com/).
-2. Sign in with any regular Google account.
-3. Click **Get API key** $\rightarrow$ **Create API key**.
+| Track | Topics Covered | Key Tools & Labs |
+| :--- | :--- | :--- |
+| **Track 1: Pentest Fundamentals** | PTES, Nmap Recon, OWASP Top 10 (SQLi, Command Injection, XSS, SSRF, IDOR), Linux/Windows PrivEsc | PortSwigger Academy, DVWA, TryHackMe |
+| **Track 2: DevSecOps & CI/CD** | Shift-Left philosophy, Secret Scanning, SAST, SCA (SBOM), DAST security gates | Gitleaks, Semgrep, Trivy, SonarQube, OWASP ZAP |
+| **Track 3: Container & Cloud Security** | Non-root Dockerfiles, minimal distroless base images, CIS Benchmarks, IaC scanning, Policy-as-Code | Checkov, tfsec, Trivy, Kyverno, OPA |
 
-### 2. Add your API Key
-Open `.env` in this directory and paste your key:
+---
+
+## 🚀 Quick Start
+
+### 1. Configure Your Free API Key
+Open `.env` and add your free Google AI Studio key:
 ```env
-GEMINI_API_KEY=AIzaSy...your_key_here
+GEMINI_API_KEY=your_key_here
 ```
 
-### 3. Run the Agent
-Run directly in your terminal:
+### 2. Run the Tutor Bot
+
+**Interactive Tutor Mode (Chat & Ask Questions):**
 ```powershell
 node --env-file=.env agent.mjs
 ```
-*(Or simply `node agent.mjs` — if no `.env` key is found, it will politely prompt you to enter it in the console).*
 
----
-
-## 🧪 Try Asking the Agent:
-- *"Search the web for the latest release of Python and summarize the top features in 3 bullet points."*
-- *"Calculate (345 * 12) / 4 and save the answer to calc_result.txt."*
-- *"What time is it right now and what files are in this directory?"*
-
----
-
-## 🐍 Python Version (Alternative)
-If you prefer running the Python version:
+**One-Shot Lesson Query:**
 ```powershell
-pip install google-genai duckduckgo-search python-dotenv
-python agent.py
+node --env-file=.env agent.mjs "Give me an overview of Track 1 and explain IDOR vulnerabilities."
+```
+
+**Zero API Key Self-Test (Tests all 8 tools locally):**
+```powershell
+npm test
 ```
 
 ---
 
-## 🛠️ Adding New Tools
-To add a new tool to `tools.mjs`:
-1. Write your async JavaScript function in [tools.mjs](tools.mjs).
-2. Add its schema description in `TOOL_DECLARATIONS`.
-3. Add the function to `TOOL_HANDLERS`.
-The agent will automatically learn when and how to invoke it!
+## 🧪 Try Asking the Tutor:
+- *"Show me all available curriculum tracks."*
+- *"Give me the lesson for module secops-201 and explain how to set up Gitleaks."*
+- *"Audit this Dockerfile: FROM node:latest \n USER root"*
+- *"Explain how SQL injection occurs in Python and show me how a SAST tool like Semgrep detects it."*
+- *"Give me a quiz on container security."*
 
+---
+
+## 🛠️ Built-in Agent Tools
+1. `listCurriculumTracks`: Lists available syllabus tracks.
+2. `getCurriculumLesson`: Pulls detailed lessons and recommended hands-on labs.
+3. `auditCodeSnippet`: Scans code or Dockerfiles for high-risk security flaws and DevSecOps checks.
+4. `searchWeb`: Free knowledge and CVE lookup.
+5. `calculate`: Safe math evaluator.
+6. `writeFile` & `readFile`: Workspace note taking.
+7. `listFiles` & `getCurrentTime`: Workspace file & time inspector.

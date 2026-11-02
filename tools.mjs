@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { CURRICULUM } from "./curriculum.mjs";
 
 /**
  * Tool 1: Safe Math Calculator
@@ -125,6 +126,116 @@ export async function getCurrentTime() {
   });
 }
 
+/**
+ * Tool 7: List Pentest & DevSecOps Curriculum Tracks
+ */
+export async function listCurriculumTracks() {
+  const summary = CURRICULUM.tracks.map((t) => ({
+    id: t.id,
+    title: t.title,
+    description: t.description,
+    moduleCount: t.modules.length,
+    moduleIds: t.modules.map((m) => `${m.id}: ${m.title}`),
+  }));
+  return JSON.stringify({ tracks: summary });
+}
+
+/**
+ * Tool 8: Get Specific Curriculum Lesson & Lab Guide
+ */
+export async function getCurriculumLesson({ moduleId }) {
+  for (const track of CURRICULUM.tracks) {
+    const found = track.modules.find(
+      (m) => m.id.toLowerCase() === (moduleId || "").toLowerCase()
+    );
+    if (found) {
+      return JSON.stringify({
+        track: track.title,
+        module: found.title,
+        id: found.id,
+        keyConcepts: found.concepts,
+        handsOnLab: found.labRecommendation,
+      });
+    }
+  }
+
+  // If not found by exact ID, search by keyword
+  const allModules = CURRICULUM.tracks.flatMap((t) =>
+    t.modules.map((m) => ({ ...m, trackTitle: t.title }))
+  );
+  const match = allModules.find(
+    (m) =>
+      m.title.toLowerCase().includes((moduleId || "").toLowerCase()) ||
+      m.concepts.some((c) =>
+        c.toLowerCase().includes((moduleId || "").toLowerCase())
+      )
+  );
+
+  if (match) {
+    return JSON.stringify({
+      track: match.trackTitle,
+      module: match.title,
+      id: match.id,
+      keyConcepts: match.concepts,
+      handsOnLab: match.labRecommendation,
+    });
+  }
+
+  return JSON.stringify({
+    error: `Module "${moduleId}" not found. Available modules: pt-101, pt-102, pt-103, secops-201, secops-202, secops-203, cloud-301, cloud-302.`,
+  });
+}
+
+/**
+ * Tool 9: DevSecOps Code & Configuration Security Audit
+ */
+export async function auditCodeSnippet({ code, language = "generic" }) {
+  const findings = [];
+
+  // Common high-risk patterns
+  if (/os\.system\(|exec\(|eval\(|child_process\.exec\(/i.test(code)) {
+    findings.push({
+      severity: "CRITICAL",
+      rule: "CWE-78: OS Command Injection",
+      details: "Use of direct shell execution function with unvalidated variables.",
+      devSecOpsCheck: "Add SAST rule (e.g., Semgrep python.lang.security.audit.dangerous-system-call) to fail CI pipeline."
+    });
+  }
+
+  if (/password\s*=\s*['"][^'"]+['"]|api_key\s*=\s*['"][^'"]+['"]|secret\s*=\s*['"][^'"]+['"]/i.test(code)) {
+    findings.push({
+      severity: "HIGH",
+      rule: "CWE-798: Hardcoded Credentials",
+      details: "Hardcoded secret or password string detected in source code.",
+      devSecOpsCheck: "Integrate pre-commit secret scanners (Gitleaks, Trufflehog) to block commits."
+    });
+  }
+
+  if (/FROM\s+[\w.-]+:latest/i.test(code)) {
+    findings.push({
+      severity: "MEDIUM",
+      rule: "CIS Docker 4.1: Immutable Base Image Tags",
+      details: "Use of ':latest' image tag leads to unpredictable pipeline builds and unvetted base images.",
+      devSecOpsCheck: "Pin images to specific SHA256 digests or immutable version tags. Enforce with Conftest / Trivy."
+    });
+  }
+
+  if (/USER\s+root/i.test(code) || (language.toLowerCase() === "dockerfile" && !/USER\s+/i.test(code))) {
+    findings.push({
+      severity: "MEDIUM",
+      rule: "CIS Docker 4.3: Container Running as Root",
+      details: "Container lacks non-root USER declaration. If container breaks out, process runs as host root.",
+      devSecOpsCheck: "Add 'USER 10001' and enforce via Kubernetes Admission Controller (Kyverno/Gatekeeper)."
+    });
+  }
+
+  return JSON.stringify({
+    language,
+    findingsCount: findings.length,
+    findings: findings.length > 0 ? findings : "No standard heuristic issues detected in basic pattern check. Perform full semantic audit.",
+  });
+}
+
 // Tool declarations formatted for Gemini Function Calling
 export const TOOL_DECLARATIONS = [
   {
@@ -140,7 +251,7 @@ export const TOOL_DECLARATIONS = [
   },
   {
     name: "searchWeb",
-    description: "Searches the web for live information, documentation, news, and facts using DuckDuckGo.",
+    description: "Searches knowledge bases and web encyclopedias for CVEs, tools, and technical documentation.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -189,6 +300,37 @@ export const TOOL_DECLARATIONS = [
       type: "OBJECT",
       properties: {}
     }
+  },
+  {
+    name: "listCurriculumTracks",
+    description: "Lists all available Penetration Testing and DevSecOps training tracks and module IDs.",
+    parameters: {
+      type: "OBJECT",
+      properties: {}
+    }
+  },
+  {
+    name: "getCurriculumLesson",
+    description: "Retrieves a structured learning lesson, key concepts, and safe hands-on lab exercise for a module (e.g. pt-101, pt-102, secops-201, secops-202, cloud-301).",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        moduleId: { type: "STRING", description: "The module ID or keyword (e.g. 'pt-102', 'sql injection', 'secops-201')" }
+      },
+      required: ["moduleId"]
+    }
+  },
+  {
+    name: "auditCodeSnippet",
+    description: "Performs a DevSecOps & offensive security code review on a provided code snippet or Dockerfile, reporting CWEs, severity, and pipeline guardrails.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        code: { type: "STRING", description: "The code or configuration content to audit" },
+        language: { type: "STRING", description: "Language or format, e.g. python, javascript, dockerfile, terraform" }
+      },
+      required: ["code"]
+    }
   }
 ];
 
@@ -199,6 +341,9 @@ export const TOOL_HANDLERS = {
   writeFile,
   readFile,
   listFiles,
-  getCurrentTime
+  getCurrentTime,
+  listCurriculumTracks,
+  getCurriculumLesson,
+  auditCodeSnippet
 };
 
