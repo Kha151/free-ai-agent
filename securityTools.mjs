@@ -377,3 +377,4 @@ async function readDirectoryContent(dir) {
   }
   return aggregate;
 }
+

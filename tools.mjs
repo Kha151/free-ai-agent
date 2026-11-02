@@ -7,6 +7,10 @@ import {
   runTrivyScan,
   runNmapScan,
 } from "./securityTools.mjs";
+import {
+  learnLatestThreats,
+  getStoredThreatIntel,
+} from "./knowledgeTools.mjs";
 
 /**
  * Tool 1: Safe Math Calculator

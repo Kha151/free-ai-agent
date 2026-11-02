@@ -1,0 +1,41 @@
+[
+  {
+    "cveId": "CVE-2026-18199",
+    "ghsaId": "GHSA-rq78-9fpp-qr4m",
+    "severity": "HIGH",
+    "package": "Multiple packages",
+    "ecosystem": "OpenSource",
+    "summary": "Zohocorp ManageEngine Password Manager Pro versions before 13236 and PAM360 versions before 8601...",
+    "patchedVersions": "Check advisory",
+    "publishedAt": "2026-11-02T09:30:27Z",
+    "pentestAngle": "Khai thác phiên bản chưa vá của Multiple packages qua vector: Zohocorp ManageEngine Password Manager Pro versions before 13236 and PAM360 versions before 8601...",
+    "devSecOpsFix": "Cập nhật package Multiple packages lên bản vá Check advisory và kích hoạt SCA scanner (Trivy/Snyk) để chặn build.",
+    "learnedAt": "2026-11-02T09:31:50.779Z"
+  },
+  {
+    "cveId": "CVE-2026-101186",
+    "ghsaId": "GHSA-xh7r-qp3f-cv4q",
+    "severity": "HIGH",
+    "package": "Multiple packages",
+    "ecosystem": "OpenSource",
+    "summary": "DoS vulnerability in the window module.\nImpact: Successful exploitation of this vulnerability may...",
+    "patchedVersions": "Check advisory",
+    "publishedAt": "2026-11-02T09:30:27Z",
+    "pentestAngle": "Khai thác phiên bản chưa vá của Multiple packages qua vector: DoS vulnerability in the window module.\nImpact: Successful exploitation of this vulnerability may...",
+    "devSecOpsFix": "Cập nhật package Multiple packages lên bản vá Check advisory và kích hoạt SCA scanner (Trivy/Snyk) để chặn build.",
+    "learnedAt": "2026-11-02T09:31:50.787Z"
+  },
+  {
+    "cveId": "CVE-2026-101176",
+    "ghsaId": "GHSA-chm4-2g7h-7hq4",
+    "severity": "HIGH",
+    "package": "Multiple packages",
+    "ecosystem": "OpenSource",
+    "summary": "Permission control vulnerability in the event notification management module.\nImpact: Successful...",
+    "patchedVersions": "Check advisory",
+    "publishedAt": "2026-11-02T09:30:27Z",
+    "pentestAngle": "Khai thác phiên bản chưa vá của Multiple packages qua vector: Permission control vulnerability in the event notification management module.\nImpact: Successful...",
+    "devSecOpsFix": "Cập nhật package Multiple packages lên bản vá Check advisory và kích hoạt SCA scanner (Trivy/Snyk) để chặn build.",
+    "learnedAt": "2026-11-02T09:31:50.787Z"
+  }
+]
