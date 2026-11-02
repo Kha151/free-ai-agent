@@ -1,67 +1,67 @@
-# 🛡️ Free Pentest & DevSecOps Master Tutor Bot
+# 🛡️ Gia Sư AI: Pentest & DevSecOps (Tiếng Việt)
 
-An autonomous, 100% free AI agent that trains you in both **Penetration Testing (Ethical Hacking)** and **DevSecOps (Automated CI/CD Security)**.
+Trợ lý & Gia sư AI hoàn toàn miễn phí, hỗ trợ đào tạo chuyên sâu về **Kiểm thử thâm nhập (Penetration Testing / Ethical Hacking)** và **Tự động hóa bảo mật CI/CD (DevSecOps)** bằng **Tiếng Việt**.
 
-- **Dual-Perspective Pedagogy**:
-  - *Offensive Lens (Pentesting)*: Understand how attackers exploit vulnerabilities, perform reconnaissance, and escalate privileges.
-  - *Defensive Lens (DevSecOps)*: Learn how to "Shift Left" and build automated security guardrails (SAST, SCA, DAST, Secret Scanning, Container Hardening) into CI/CD pipelines.
-- **Embedded Curriculum**: Structured tracks with hands-on lab exercises (OWASP Juice Shop, DVWA, PortSwigger Web Security Academy, TryHackMe).
-- **Automated Security Tools**: Built-in static code & Dockerfile security auditor, curriculum guide, DuckDuckGo/Wikipedia knowledge base, and math calculator.
-- **Zero Cost**: Runs on Google Gemini API free tier (1,500 requests/day).
+- **Phương pháp đào tạo 2 chiều (Dual-Perspective)**:
+  - *Góc nhìn Tấn công (Pentest)*: Hiểu cách hacker thu thập thông tin (Recon), khai thác lỗ hổng Web (OWASP Top 10) và leo thang đặc quyền (PrivEsc).
+  - *Góc nhìn Phòng thủ (DevSecOps)*: Áp dụng triết lý "Shift-Left", cấu hình các cổng kiểm soát bảo mật tự động (Secret Scanning, SAST, SCA, DAST, Container Hardening) trong pipeline GitHub Actions / GitLab CI.
+- **Giáo trình tích hợp sẵn (`curriculum.mjs`)**: Lộ trình bài bản kèm hướng dẫn thực hành trên các phòng lab hợp pháp (PortSwigger Web Security Academy, OWASP Juice Shop, DVWA, TryHackMe).
+- **Bộ công cụ bảo mật tích hợp**: Tự động rà soát mã nguồn & Dockerfile, tra cứu CVE, tính toán và ghi chép bài học vào workspace.
+- **Hoàn toàn miễn phí**: Sử dụng Google Gemini API Free Tier (1,500 requests/ngày).
 
 ---
 
-## 📚 Curriculum Tracks
+## 📚 Lộ Trình Học Tập Tích Hợp
 
-| Track | Topics Covered | Key Tools & Labs |
+| Lộ trình (Track) | Nội dung trọng tâm | Công cụ & Lab thực hành |
 | :--- | :--- | :--- |
-| **Track 1: Pentest Fundamentals** | PTES, Nmap Recon, OWASP Top 10 (SQLi, Command Injection, XSS, SSRF, IDOR), Linux/Windows PrivEsc | PortSwigger Academy, DVWA, TryHackMe |
-| **Track 2: DevSecOps & CI/CD** | Shift-Left philosophy, Secret Scanning, SAST, SCA (SBOM), DAST security gates | Gitleaks, Semgrep, Trivy, SonarQube, OWASP ZAP |
-| **Track 3: Container & Cloud Security** | Non-root Dockerfiles, minimal distroless base images, CIS Benchmarks, IaC scanning, Policy-as-Code | Checkov, tfsec, Trivy, Kyverno, OPA |
+| **Track 1: Nền tảng Pentest** | Quy trình PTES, Quét mạng với Nmap, Lỗ hổng Web OWASP Top 10 (SQLi, Command Injection, XSS, SSRF, IDOR), Leo thang đặc quyền Linux/Windows. | PortSwigger Academy, DVWA, TryHackMe |
+| **Track 2: DevSecOps & CI/CD** | Triết lý Shift-Left, Quét lộ lọt Secret, Quét mã tĩnh SAST, Phân tích phụ thuộc SCA (SBOM), Cổng kiểm soát DAST. | Gitleaks, Semgrep, Trivy, SonarQube, OWASP ZAP |
+| **Track 3: Bảo mật Container & Cloud** | Tối ưu Dockerfile không dùng root, hình ảnh distroless, chuẩn CIS Benchmarks, Quét hạ tầng IaC (Terraform) và Policy-as-Code. | Checkov, tfsec, Trivy, Kyverno, OPA |
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Hướng Dẫn Khởi Động Nhanh
 
-### 1. Configure Your Free API Key
-Open `.env` and add your free Google AI Studio key:
+### 1. Cấu hình Gemini API Key miễn phí
+Mở file [`.env`](.env) và điền key của bạn từ [Google AI Studio](https://aistudio.google.com/):
 ```env
-GEMINI_API_KEY=your_key_here
+GEMINI_API_KEY=your_gemini_key_here
 ```
 
-### 2. Run the Tutor Bot
+### 2. Chạy Gia Sư AI
 
-**Interactive Tutor Mode (Chat & Ask Questions):**
+**Chế độ Chat trực tiếp (Hỏi đáp & Học tập tương tác):**
 ```powershell
 node --env-file=.env agent.mjs
 ```
 
-**One-Shot Lesson Query:**
+**Đặt câu hỏi nhanh qua dòng lệnh (CLI):**
 ```powershell
-node --env-file=.env agent.mjs "Give me an overview of Track 1 and explain IDOR vulnerabilities."
+node --env-file=.env agent.mjs "Hãy giới thiệu lộ trình Track 2 và giải thích cách hoạt động của SAST."
 ```
 
-**Zero API Key Self-Test (Tests all 8 tools locally):**
+**Chạy kiểm tra sức khỏe hệ thống (Self-test không cần API key):**
 ```powershell
 npm test
 ```
 
 ---
 
-## 🧪 Try Asking the Tutor:
-- *"Show me all available curriculum tracks."*
-- *"Give me the lesson for module secops-201 and explain how to set up Gitleaks."*
-- *"Audit this Dockerfile: FROM node:latest \n USER root"*
-- *"Explain how SQL injection occurs in Python and show me how a SAST tool like Semgrep detects it."*
-- *"Give me a quiz on container security."*
+## 💡 Gợi Ý Câu Hỏi Cho Gia Sư AI:
+- *"Hãy liệt kê tất cả các track học và gợi ý lộ trình bắt đầu cho người mới."*
+- *"Hãy dạy tôi module secops-201 và hướng dẫn cấu hình Gitleaks trong GitHub Actions."*
+- *"Kiểm tra bảo mật file Dockerfile này giúp tôi: FROM node:latest \n USER root"*
+- *"Giải thích cơ chế tấn công SQL Injection và cách công cụ SAST như Semgrep phát hiện nó."*
+- *"Tạo cho tôi một bài kiểm tra trắc nghiệm 3 câu hỏi về bảo mật container Docker."*
 
 ---
 
-## 🛠️ Built-in Agent Tools
-1. `listCurriculumTracks`: Lists available syllabus tracks.
-2. `getCurriculumLesson`: Pulls detailed lessons and recommended hands-on labs.
-3. `auditCodeSnippet`: Scans code or Dockerfiles for high-risk security flaws and DevSecOps checks.
-4. `searchWeb`: Free knowledge and CVE lookup.
-5. `calculate`: Safe math evaluator.
-6. `writeFile` & `readFile`: Workspace note taking.
-7. `listFiles` & `getCurrentTime`: Workspace file & time inspector.
+## 🛠️ Danh Sách Công Cụ Tự Động:
+1. `listCurriculumTracks`: Xem danh sách tất cả các lộ trình bài học.
+2. `getCurriculumLesson`: Tải chi tiết bài học lý thuyết và lab thực hành an toàn.
+3. `auditCodeSnippet`: Tự động rà soát mã nguồn hoặc Dockerfile, chỉ ra lỗ hổng CWE và cách chặn trong CI/CD.
+4. `searchWeb`: Tra cứu kiến thức an ninh mạng và cơ sở dữ liệu CVE.
+5. `calculate`: Máy tính biểu thức số học an toàn.
+6. `writeFile` & `readFile`: Ghi chép tài liệu học tập vào máy tính.
+7. `listFiles` & `getCurrentTime`: Kiểm tra file và thời gian hệ thống.

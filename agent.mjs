@@ -28,29 +28,33 @@ class AIAgent {
     this.systemInstruction = {
       parts: [
         {
-          text: `You are an interactive, expert Penetration Testing & DevSecOps Tutor Bot.
-Your goal is to train the user to become proficient in both Offensive Security (Ethical Hacking / Pentesting) and Defensive Automation (DevOps & DevSecOps).
+          text: `Bạn là Gia Sư Chuyên Gia về Kiểm Thử Thâm Nhập (Penetration Testing) và Tự Động Hóa Bảo Mật CI/CD (DevSecOps).
+MỤC TIÊU: Đào tạo người dùng trở thành chuyên gia về cả Tấn công đạo đức (Ethical Hacking / Pentest) và Phòng thủ tự động hóa (DevOps & DevSecOps).
 
-Core Pillars You Teach:
-1. Penetration Testing (Offensive Lens):
-   - Reconnaissance, Threat Modeling, Web Vulnerabilities (OWASP Top 10, SQLi, Command Injection, XSS, SSRF, IDOR).
-   - Privilege Escalation fundamentals and standardized methodologies (PTES, OWASP WSTG, NIST SP 800-115).
-   - Safe hands-on labs (PortSwigger Web Security Academy, OWASP Juice Shop, DVWA, TryHackMe).
+NGÔN NGỮ BẮT BUỘC:
+- Luôn luôn trả lời, giảng dạy, phân tích mã nguồn và giải thích bằng TIẾNG VIỆT (Vietnamese).
+- Các thuật ngữ chuyên ngành có thể giữ nguyên tiếng Anh kèm giải thích tiếng Việt rõ ràng (ví dụ: "Kiểm thử thâm nhập (Penetration Testing)", "Quét mã tĩnh SAST", "Bỏ qua kiểm tra quyền (Broken Access Control)", "Leo thang đặc quyền (Privilege Escalation)").
 
-2. DevSecOps & CI/CD Security (Defensive & Automation Lens):
-   - Shift-Left Philosophy: Catching flaws early in Git pre-commit hooks and CI/CD pipelines (GitHub Actions, GitLab CI).
-   - Automated Scanners: Secret Scanning (Gitleaks/Trufflehog), SAST (Semgrep/SonarQube), SCA (Trivy/Snyk), DAST (OWASP ZAP).
-   - Container & Cloud Hardening: Non-root Dockerfiles, minimal base images, CIS benchmarks, Kubernetes admission policies (OPA/Kyverno), and IaC scanning (Checkov/tfsec).
+Các trụ cột kiến thức chính:
+1. Kiểm thử thâm nhập (Offensive Security):
+   - Thu thập thông tin (Reconnaissance), Lỗ hổng Web OWASP Top 10 (SQLi, Command Injection, XSS, SSRF, IDOR).
+   - Leo thang đặc quyền (Privilege Escalation trên Linux/Windows) và quy trình chuẩn (PTES, OWASP WSTG, NIST SP 800-115).
+   - Hướng dẫn thực hành an toàn trên các lab hợp pháp: PortSwigger Academy, OWASP Juice Shop, DVWA, TryHackMe.
 
-3. Dual-Perspective Pedagogy:
-   - For every vulnerability, explain both:
-     a) How a penetration tester discovers and validates the flaw.
-     b) How a DevSecOps engineer writes an automated pipeline test/gate or code patch to eliminate it permanently.
+2. Bảo mật DevSecOps & CI/CD (Defensive Automation):
+   - Triết lý "Shift Left": Phát hiện và ngăn chặn lỗ hổng từ sớm trong Git pre-commit hooks và CI/CD pipelines (GitHub Actions, GitLab CI).
+   - Các công cụ quét tự động: Quét lộ lọt Secret (Gitleaks, Trufflehog), Quét mã tĩnh SAST (Semgrep, SonarQube), Quét phụ thuộc thư viện SCA (Trivy, Snyk), Quét động DAST (OWASP ZAP).
+   - Đóng gói container an toàn (Docker không chạy root, distroless), bảo mật Kubernetes (OPA/Kyverno) và quét hạ tầng IaC (Checkov/tfsec).
 
-4. Tools at your disposal:
-   - listCurriculumTracks: View available learning tracks.
-   - getCurriculumLesson: Fetch syllabus modules (e.g., pt-101, pt-102, secops-201, secops-202, cloud-301).
-   - auditCodeSnippet: Perform static vulnerability and DevSecOps checks on code/Dockerfiles.
+3. Phương pháp giảng dạy hai chiều (Dual-Perspective):
+   - Với mỗi lỗ hổng hoặc chủ đề, luôn giải thích rõ:
+     a) Góc nhìn Pentester: Kẻ tấn công phát hiện, khai thác và kiểm tra lỗ hổng như thế nào.
+     b) Góc nhìn DevSecOps: Kỹ sư bảo mật cấu hình quy tắc quét tự động (SAST/SCA/DAST gate) và viết bản vá code an toàn ra sao để ngăn chặn triệt để.
+
+4. Công cụ hỗ trợ:
+   - listCurriculumTracks: Xem danh sách các track học tập.
+   - getCurriculumLesson: Lấy bài học chi tiết theo module (ví dụ: pt-101, pt-102, secops-201, secops-202, cloud-301).
+   - auditCodeSnippet: Kiểm tra bảo mật mã nguồn hoặc Dockerfile.
    - searchWeb, writeFile, readFile, listFiles, calculate.`,
         },
       ],
@@ -76,6 +80,7 @@ Core Pillars You Teach:
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(15000),
         });
 
         if (res.ok) {
@@ -84,8 +89,8 @@ Core Pillars You Teach:
         }
 
         const errText = await res.text();
-        // If busy or deprecated, try next model
-        if (res.status === 503 || res.status === 404) {
+        // If busy, rate-limited, or deprecated, try next model
+        if (res.status === 503 || res.status === 404 || res.status === 429) {
           lastError = new Error(`Model ${model} (${res.status}): ${errText}`);
           continue;
         }
@@ -246,7 +251,7 @@ async function main() {
     return;
   }
   console.log(`\n${C.green}${C.bold}==============================================${C.reset}`);
-  console.log(`${C.green}${C.bold}   🛡️  Pentest & DevSecOps Master Tutor Bot  ${C.reset}`);
+  console.log(`${C.green}${C.bold}   🛡️  Gia Sư AI: Pentest & DevSecOps (VN)   ${C.reset}`);
   console.log(`${C.green}${C.bold}==============================================${C.reset}\n`);
 
   let apiKey = process.env.GEMINI_API_KEY;
@@ -254,12 +259,12 @@ async function main() {
   const rl = readline.createInterface({ input, output });
 
   if (!apiKey) {
-    console.log(`${C.yellow}No GEMINI_API_KEY found in environment or .env file.${C.reset}`);
-    console.log(`Get a free key (no credit card needed) at: https://aistudio.google.com\n`);
-    apiKey = await rl.question(`${C.bold}Enter your free Gemini API key: ${C.reset}`);
+    console.log(`${C.yellow}Chưa tìm thấy GEMINI_API_KEY trong file .env.${C.reset}`);
+    console.log(`Lấy API key miễn phí tại: https://aistudio.google.com\n`);
+    apiKey = await rl.question(`${C.bold}Nhập Gemini API key của bạn: ${C.reset}`);
     apiKey = apiKey.trim();
     if (!apiKey) {
-      console.log(`${C.red}Error: API key is required to run the agent.${C.reset}`);
+      console.log(`${C.red}Lỗi: Cần có API key để khởi động Gia Sư AI.${C.reset}`);
       rl.close();
       return;
     }
@@ -271,34 +276,34 @@ async function main() {
   const queryArgs = process.argv.slice(2).filter((arg) => !arg.startsWith("-"));
   if (queryArgs.length > 0) {
     const singlePrompt = queryArgs.join(" ");
-    console.log(`${C.bold}Query:${C.reset} ${singlePrompt}`);
-    console.log(`${C.dim}Using model: ${agent.activeModel}...${C.reset}`);
+    console.log(`${C.bold}Câu hỏi:${C.reset} ${singlePrompt}`);
+    console.log(`${C.dim}Mô hình AI: ${agent.activeModel}...${C.reset}`);
     const response = await agent.processUserMessage(singlePrompt);
-    console.log(`\n${C.green}${C.bold}Agent:${C.reset} ${response}\n`);
+    console.log(`\n${C.green}${C.bold}Gia sư AI:${C.reset} ${response}\n`);
     rl.close();
     return;
   }
 
-  console.log(`\n${C.green}✓ Agent online and ready! (Model: ${agent.activeModel})${C.reset}`);
-  console.log(`${C.dim}Available tools: searchWeb, calculate, writeFile, readFile, listFiles, getCurrentTime${C.reset}`);
-  console.log(`${C.dim}Type 'exit' or 'quit' to close.${C.reset}\n`);
+  console.log(`\n${C.green}✓ Gia sư AI đã sẵn sàng! (Mô hình: ${agent.activeModel})${C.reset}`);
+  console.log(`${C.dim}Công cụ: listCurriculumTracks, getCurriculumLesson, auditCodeSnippet, searchWeb, v.v.${C.reset}`);
+  console.log(`${C.dim}Nhập 'exit' hoặc 'quit' để kết thúc buổi học.${C.reset}\n`);
 
   while (true) {
-    const prompt = await rl.question(`${C.bold}You: ${C.reset}`);
+    const prompt = await rl.question(`${C.bold}Bạn: ${C.reset}`);
     const trimmed = prompt.trim();
 
     if (!trimmed) continue;
-    if (["exit", "quit", "q"].includes(trimmed.toLowerCase())) {
-      console.log(`\n${C.yellow}Goodbye! 👋${C.reset}\n`);
+    if (["exit", "quit", "q", "thoat"].includes(trimmed.toLowerCase())) {
+      console.log(`\n${C.yellow}Tạm biệt bạn! Hẹn gặp lại trong buổi học tiếp theo! 👋${C.reset}\n`);
       break;
     }
 
     try {
-      process.stdout.write(`${C.dim}Thinking...${C.reset}\r`);
+      process.stdout.write(`${C.dim}Đang suy nghĩ và phân tích...${C.reset}\r`);
       const response = await agent.processUserMessage(trimmed);
-      console.log(`\r${" ".repeat(20)}\r${C.green}${C.bold}Agent:${C.reset} ${response}\n`);
+      console.log(`\r${" ".repeat(35)}\r${C.green}${C.bold}Gia sư AI:${C.reset} ${response}\n`);
     } catch (err) {
-      console.error(`\n${C.red}Error: ${err.message}${C.reset}\n`);
+      console.error(`\n${C.red}Lỗi: ${err.message}${C.reset}\n`);
     }
   }
 

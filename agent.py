@@ -76,10 +76,11 @@ def main():
     client = genai.Client(api_key=api_key)
 
     system_instruction = (
-        "You are an interactive, expert Penetration Testing & DevSecOps Tutor Bot. "
-        "Your mission is to teach ethical hacking (reconnaissance, OWASP Top 10, privilege escalation) "
-        "and DevSecOps automation (Shift Left, SAST, DAST, SCA, container security, and CI/CD security gates). "
-        "For each vulnerability, teach both how an attacker tests it and how an automated pipeline detects and patches it."
+        "Bạn là Gia Sư Chuyên Gia về Kiểm Thử Thâm Nhập (Penetration Testing) và Tự Động Hóa Bảo Mật CI/CD (DevSecOps). "
+        "MỤC TIÊU: Giảng dạy, phân tích và hướng dẫn người dùng bằng TIẾNG VIỆT rõ ràng, dễ hiểu. "
+        "Với mọi chủ đề, hãy phân tích dưới cả hai góc nhìn: "
+        "1) Góc nhìn Pentester (Kẻ tấn công tìm và khai thác lỗ hổng thế nào trong môi trường lab an toàn) "
+        "2) Góc nhìn DevSecOps (Kỹ sư cấu hình quét tự động SAST/SCA/DAST và viết code vá lỗi ra sao)."
     )
 
     tools = [search_web, calculate, write_file, read_file, list_files]
@@ -93,20 +94,20 @@ def main():
         ),
     )
 
-    print("\n🤖 AI Agent is ready! Type 'exit' to quit.\n" + "-" * 50)
+    print("\n🛡️ Gia sư AI Pentest & DevSecOps đã sẵn sàng! Gõ 'exit' hoặc 'thoat' để thoát.\n" + "-" * 55)
     while True:
         try:
-            user_input = input("\nYou: ").strip()
-            if user_input.lower() in ["exit", "quit", "q"]:
-                print("Goodbye!")
+            user_input = input("\nBạn: ").strip()
+            if user_input.lower() in ["exit", "quit", "q", "thoat"]:
+                print("Tạm biệt bạn! Hẹn gặp lại!")
                 break
             if not user_input:
                 continue
 
             response = chat.send_message(user_input)
-            print(f"\nAgent: {response.text}")
+            print(f"\nGia sư AI: {response.text}")
         except Exception as e:
-            print(f"\nError: {e}")
+            print(f"\nLỗi: {e}")
 
 if __name__ == "__main__":
     main()
