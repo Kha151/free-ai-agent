@@ -19,69 +19,59 @@ export async function calculate({ expression }) {
 }
 
 /**
- * Tool 2: DuckDuckGo Free Web Search (no API key required)
+ * Tool 2: Free Web & Knowledge Search (Wikipedia API + DuckDuckGo Instant Answers)
  */
 export async function searchWeb({ query }) {
+  const snippets = [];
+
   try {
-    // 1. First try DuckDuckGo Instant Answer API
-    const apiUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
-    const res = await fetch(apiUrl, {
-      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) FreeAIAgent/1.0" }
-    });
-    
-    if (res.ok) {
-      const data = await res.json();
-      const snippets = [];
-
-      if (data.Heading && data.AbstractText) {
-        snippets.push(`[${data.Heading}]: ${data.AbstractText}`);
-      }
-
-      if (Array.isArray(data.RelatedTopics)) {
-        for (const topic of data.RelatedTopics.slice(0, 4)) {
-          if (topic.Text) {
-            snippets.push(`- ${topic.Text} (${topic.FirstURL || ""})`);
-          }
-        }
-      }
-
-      if (snippets.length > 0) {
-        return JSON.stringify({ query, results: snippets.join("\n\n") });
-      }
-    }
-
-    // 2. Fallback to DuckDuckGo HTML Lite search
-    const htmlUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
-    const htmlRes = await fetch(htmlUrl, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "text/html"
-      }
+    // 1. Wikipedia Search API (Free, fast, never blocked by captchas)
+    const wikiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
+      query
+    )}&utf8=&format=json`;
+    const wikiRes = await fetch(wikiUrl, {
+      headers: { "User-Agent": "FreeAIAgent/1.0 (https://github.com/Kha151/free-ai-agent)" },
     });
 
-    if (htmlRes.ok) {
-      const html = await htmlRes.text();
-      const matches = [];
-      const regex = /<a class="result__snippet[^>]*>(.*?)<\/a>/gs;
-      let match;
-      let count = 0;
-      while ((match = regex.exec(html)) !== null && count < 3) {
-        const snippet = match[1].replace(/<[^>]+>/g, "").trim();
-        if (snippet) {
-          matches.push(`Result ${count + 1}: ${snippet}`);
-          count++;
-        }
-      }
-
-      if (matches.length > 0) {
-        return JSON.stringify({ query, results: matches.join("\n\n") });
+    if (wikiRes.ok) {
+      const data = await wikiRes.json();
+      const items = data.query?.search || [];
+      for (const item of items.slice(0, 3)) {
+        const cleanSnippet = item.snippet.replace(/<[^>]+>/g, "").trim();
+        snippets.push(`[${item.title}]: ${cleanSnippet}`);
       }
     }
-
-    return JSON.stringify({ query, results: "No direct search snippets returned. Try a different query." });
   } catch (err) {
-    return JSON.stringify({ error: `Search failed: ${err.message}` });
+    // Continue to fallback
   }
+
+  try {
+    // 2. DuckDuckGo Instant Answer API
+    const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(
+      query
+    )}&format=json&no_html=1&skip_disambig=1`;
+    const ddgRes = await fetch(ddgUrl, {
+      headers: { "User-Agent": "FreeAIAgent/1.0" },
+    });
+
+    if (ddgRes.ok) {
+      const ddgData = await ddgRes.json();
+      if (ddgData.Heading && ddgData.AbstractText) {
+        snippets.unshift(`[${ddgData.Heading}]: ${ddgData.AbstractText}`);
+      }
+    }
+  } catch (err) {
+    // Fallback handled
+  }
+
+  if (snippets.length > 0) {
+    return JSON.stringify({ query, results: snippets.join("\n\n") });
+  }
+
+  return JSON.stringify({
+    query,
+    results: `No direct web search snippets found for "${query}". Try rephrasing the search term.`,
+  });
 }
 
 /**

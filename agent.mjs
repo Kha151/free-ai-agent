@@ -13,13 +13,18 @@ const C = {
   dim: "\x1b[2m",
 };
 
-const MODEL_NAME = "gemini-2.0-flash";
+const DEFAULT_MODELS = [
+  "gemini-3.1-flash-lite",
+  "gemini-3.8-flash",
+  "gemini-flash-latest",
+];
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
 class AIAgent {
   constructor(apiKey) {
     this.apiKey = apiKey;
     this.history = [];
+    this.activeModel = DEFAULT_MODELS[0];
     this.systemInstruction = {
       parts: [
         {
@@ -40,28 +45,45 @@ Guidelines:
   }
 
   async callGemini(contents) {
-    const url = `${API_BASE}/${MODEL_NAME}:generateContent?key=${this.apiKey}`;
-    const payload = {
-      systemInstruction: this.systemInstruction,
-      contents,
-      tools: [{ functionDeclarations: TOOL_DECLARATIONS }],
-      generationConfig: {
-        temperature: 0.2,
-      },
-    };
+    let lastError = null;
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    for (const model of DEFAULT_MODELS) {
+      const url = `${API_BASE}/${model}:generateContent?key=${this.apiKey}`;
+      const payload = {
+        systemInstruction: this.systemInstruction,
+        contents,
+        tools: [{ functionDeclarations: TOOL_DECLARATIONS }],
+        generationConfig: {
+          temperature: 0.2,
+        },
+      };
 
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Gemini API error (${res.status}): ${errText}`);
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          this.activeModel = model;
+          return await res.json();
+        }
+
+        const errText = await res.text();
+        // If busy or deprecated, try next model
+        if (res.status === 503 || res.status === 404) {
+          lastError = new Error(`Model ${model} (${res.status}): ${errText}`);
+          continue;
+        }
+
+        throw new Error(`Gemini API error (${res.status}): ${errText}`);
+      } catch (err) {
+        lastError = err;
+      }
     }
 
-    return await res.json();
+    throw lastError || new Error("Failed to communicate with Gemini API models.");
   }
 
   async processUserMessage(userText) {
@@ -217,7 +239,19 @@ async function main() {
 
   const agent = new AIAgent(apiKey);
 
-  console.log(`\n${C.green}✓ Agent online and ready!${C.reset}`);
+  // Check if a single query was passed via command line (e.g. node agent.mjs "What time is it?")
+  const queryArgs = process.argv.slice(2).filter((arg) => !arg.startsWith("-"));
+  if (queryArgs.length > 0) {
+    const singlePrompt = queryArgs.join(" ");
+    console.log(`${C.bold}Query:${C.reset} ${singlePrompt}`);
+    console.log(`${C.dim}Using model: ${agent.activeModel}...${C.reset}`);
+    const response = await agent.processUserMessage(singlePrompt);
+    console.log(`\n${C.green}${C.bold}Agent:${C.reset} ${response}\n`);
+    rl.close();
+    return;
+  }
+
+  console.log(`\n${C.green}✓ Agent online and ready! (Model: ${agent.activeModel})${C.reset}`);
   console.log(`${C.dim}Available tools: searchWeb, calculate, writeFile, readFile, listFiles, getCurrentTime${C.reset}`);
   console.log(`${C.dim}Type 'exit' or 'quit' to close.${C.reset}\n`);
 

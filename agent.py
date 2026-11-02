@@ -84,7 +84,7 @@ def main():
     tools = [search_web, calculate, write_file, read_file, list_files]
 
     chat = client.chats.create(
-        model="gemini-2.0-flash",
+        model="gemini-3.1-flash-lite",
         config=types.GenerateContentConfig(
             system_instruction=system_instruction,
             tools=tools,
