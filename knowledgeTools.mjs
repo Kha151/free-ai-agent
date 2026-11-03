@@ -4,12 +4,182 @@ import path from "path";
 const KNOWLEDGE_DIR = path.resolve(process.cwd(), "knowledge");
 const THREAT_INTEL_FILE = path.join(KNOWLEDGE_DIR, "threat_intel.json");
 const THREAT_NOTES_FILE = path.join(KNOWLEDGE_DIR, "threat_notes.md");
+const DOCUMENTS_INDEX_FILE = path.join(KNOWLEDGE_DIR, "documents_index.json");
 
 /**
  * Ensure the knowledge directory exists
  */
 async function ensureKnowledgeDir() {
   await fs.mkdir(KNOWLEDGE_DIR, { recursive: true });
+}
+
+/**
+ * 3. Learn & Ingest Knowledge from PDF, DOCX, TXT, MD Documents
+ */
+export async function learnFromDocument({ filePath, title = "" }) {
+  await ensureKnowledgeDir();
+
+  const resolvedPath = path.resolve(process.cwd(), filePath);
+  const ext = path.extname(resolvedPath).toLowerCase();
+  const docTitle = title || path.basename(resolvedPath);
+
+  let extractedText = "";
+
+  try {
+    if (ext === ".pdf") {
+      const pdfParse = (await import("pdf-parse")).default;
+      const dataBuffer = await fs.readFile(resolvedPath);
+      const pdfData = await pdfParse(dataBuffer);
+      extractedText = pdfData.text || "";
+    } else if (ext === ".docx") {
+      const mammoth = (await import("mammoth")).default;
+      const result = await mammoth.extractRawText({ path: resolvedPath });
+      extractedText = result.value || "";
+    } else if ([".txt", ".md", ".json", ".csv", ".log", ".yaml", ".yml"].includes(ext)) {
+      extractedText = await fs.readFile(resolvedPath, "utf-8");
+    } else {
+      return JSON.stringify({
+        error: `Định dạng '${ext}' chưa được hỗ trợ. Hãy dùng file: .pdf, .docx, .txt, .md, .yaml, .json, .csv`
+      });
+    }
+  } catch (err) {
+    return JSON.stringify({
+      error: `Không thể đọc tài liệu '${filePath}': ${err.message}`
+    });
+  }
+
+  // Clean and summarize key concepts
+  const cleanText = extractedText.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  if (!cleanText) {
+    return JSON.stringify({
+      error: `Tài liệu '${filePath}' không chứa nội dung văn bản nào để học.`
+    });
+  }
+
+  const wordCount = cleanText.split(/\s+/).length;
+  // Trích xuất tóm tắt ngắn và các đoạn trích quan trọng
+  const preview = cleanText.slice(0, 3000);
+
+  // Lưu vào documents_index.json
+  let docIndex = [];
+  try {
+    const raw = await fs.readFile(DOCUMENTS_INDEX_FILE, "utf-8");
+    docIndex = JSON.parse(raw);
+  } catch {
+    docIndex = [];
+  }
+
+  const newDocEntry = {
+    id: `doc-${Date.now()}`,
+    title: docTitle,
+    filePath: path.relative(process.cwd(), resolvedPath),
+    extension: ext,
+    wordCount,
+    learnedAt: new Date().toISOString(),
+    excerpt: cleanText.slice(0, 500) + (cleanText.length > 500 ? "..." : "")
+  };
+
+  // Cập nhật hoặc thêm mới
+  const existingIndex = docIndex.findIndex(d => d.filePath === newDocEntry.filePath);
+  if (existingIndex >= 0) {
+    docIndex[existingIndex] = newDocEntry;
+  } else {
+    docIndex.push(newDocEntry);
+  }
+
+  await fs.writeFile(DOCUMENTS_INDEX_FILE, JSON.stringify(docIndex, null, 2), "utf-8");
+
+  // Lưu bản tóm tắt markdown vào knowledge/documents/
+  const docStoreDir = path.join(KNOWLEDGE_DIR, "documents");
+  await fs.mkdir(docStoreDir, { recursive: true });
+  const safeDocName = path.basename(resolvedPath, ext).replace(/[^a-zA-Z0-9_\-]/g, "_");
+  const markdownPath = path.join(docStoreDir, `${safeDocName}.md`);
+  
+  const markdownContent = `# Tài Liệu Đã Học: ${docTitle}
+- **File gốc**: \`${newDocEntry.filePath}\`
+- **Định dạng**: \`${ext}\`
+- **Số từ**: ~${wordCount} từ
+- **Thời gian học**: ${newDocEntry.learnedAt}
+
+## Nội dung trích xuất
+\`\`\`text
+${cleanText.slice(0, 8000)}
+${cleanText.length > 8000 ? "\n... (nội dung tiếp tục được lưu trong file gốc) ..." : ""}
+\`\`\`
+`;
+  await fs.writeFile(markdownPath, markdownContent, "utf-8");
+
+  return JSON.stringify({
+    status: "SUCCESS",
+    message: `Đã phân tích, đọc hiểu và nạp thành công tài liệu '${docTitle}' vào bộ nhớ tri thức của Gia Sư AI.`,
+    file: newDocEntry.filePath,
+    wordCount,
+    savedTo: path.relative(process.cwd(), markdownPath),
+    contentPreview: preview.slice(0, 1500)
+  });
+}
+
+/**
+ * 4. Search and Query Knowledge from Uploaded Documents
+ */
+export async function queryLearnedDocuments({ query = "" }) {
+  await ensureKnowledgeDir();
+
+  let docIndex = [];
+  try {
+    const raw = await fs.readFile(DOCUMENTS_INDEX_FILE, "utf-8");
+    docIndex = JSON.parse(raw);
+  } catch {
+    return JSON.stringify({
+      message: "Chưa có tài liệu PDF/DOCX nào được nạp vào. Hãy dùng lệnh `learnFromDocument` để tải tài liệu lên.",
+      documents: []
+    });
+  }
+
+  if (docIndex.length === 0) {
+    return JSON.stringify({
+      message: "Chưa có tài liệu nào được lưu trong cơ sở tri thức.",
+      documents: []
+    });
+  }
+
+  if (!query) {
+    return JSON.stringify({
+      totalLearnedDocuments: docIndex.length,
+      documents: docIndex
+    });
+  }
+
+  const cleanQ = query.toLowerCase();
+  const matched = [];
+
+  // Tìm trong index và nội dung documents
+  const docStoreDir = path.join(KNOWLEDGE_DIR, "documents");
+  for (const doc of docIndex) {
+    let fullText = doc.excerpt;
+    try {
+      const mdFile = path.join(docStoreDir, `${path.basename(doc.filePath, doc.extension).replace(/[^a-zA-Z0-9_\-]/g, "_")}.md`);
+      fullText = await fs.readFile(mdFile, "utf-8");
+    } catch {}
+
+    if (
+      doc.title.toLowerCase().includes(cleanQ) ||
+      fullText.toLowerCase().includes(cleanQ)
+    ) {
+      matched.push({
+        title: doc.title,
+        file: doc.filePath,
+        learnedAt: doc.learnedAt,
+        snippet: fullText.slice(0, 600) + "..."
+      });
+    }
+  }
+
+  return JSON.stringify({
+    query,
+    matchCount: matched.length,
+    results: matched.length > 0 ? matched : `Không tìm thấy nội dung khớp với từ khóa '${query}' trong các tài liệu đã học.`
+  });
 }
 
 /**

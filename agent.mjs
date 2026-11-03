@@ -63,6 +63,8 @@ Các trụ cột kiến thức chính:
    - listCurriculumTracks: Xem danh sách các track học tập.
    - getCurriculumLesson: Lấy bài học chi tiết theo module (ví dụ: pt-101, pt-102, secops-201, secops-202, cloud-301).
    - auditCodeSnippet: Kiểm tra bảo mật mã nguồn hoặc Dockerfile.
+   - learnFromDocument: Học và phân tích tài liệu người dùng tải lên (PDF, DOCX, TXT, MD, YAML, JSON, CSV).
+   - queryLearnedDocuments: Tra cứu kiến thức trong các tài liệu đã học.
    - runNmapScan, runNiktoScan, runSqlmapScan, runDirbScan, runGobusterScan, runMetasploitScan, runKaliCommand.
    - learnLatestThreats, getStoredThreatIntel.
    - searchWeb, writeFile, readFile, listFiles, calculate.`,
@@ -272,6 +274,21 @@ async function runSelfTest() {
     process.stdout.write("  Testing runNmapScan (127.0.0.1)... ");
     const nmapRes = JSON.parse(await TOOL_HANDLERS.runNmapScan({ targetHost: "127.0.0.1", ports: "80,443" }));
     console.log(`${C.green}✓ OK${C.reset} (${nmapRes.engine})`);
+
+    // 13. Learn from Document tool (PDF/DOCX/TXT/MD)
+    process.stdout.write("  Testing learnFromDocument (test markdown file)... ");
+    const sampleDocPath = "test_pentest_notes.md";
+    await (await import("fs/promises")).writeFile(sampleDocPath, "# OWASP API Security\nCheck BOLA and Broken Authentication.", "utf-8");
+    const learnDocRes = JSON.parse(await TOOL_HANDLERS.learnFromDocument({ filePath: sampleDocPath, title: "Test API Security Guide" }));
+    console.log(`${C.green}✓ OK${C.reset} (${learnDocRes.status})`);
+
+    // 14. Query Learned Documents
+    process.stdout.write("  Testing queryLearnedDocuments ('BOLA')... ");
+    const queryDocRes = JSON.parse(await TOOL_HANDLERS.queryLearnedDocuments({ query: "BOLA" }));
+    console.log(`${C.green}✓ OK${C.reset} (${queryDocRes.matchCount} match found)`);
+
+    // Clean up temporary test files
+    await (await import("fs/promises")).unlink(sampleDocPath).catch(() => {});
 
     // Clean up temporary test file
     await (await import("fs/promises")).unlink("test_agent.tmp").catch(() => { });

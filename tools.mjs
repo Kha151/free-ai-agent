@@ -16,6 +16,8 @@ import {
 import {
   learnLatestThreats,
   getStoredThreatIntel,
+  learnFromDocument,
+  queryLearnedDocuments,
 } from "./knowledgeTools.mjs";
 
 /**
@@ -459,6 +461,49 @@ export const TOOL_DECLARATIONS = [
       },
       required: ["command"]
     }
+  },
+  {
+    name: "learnFromDocument",
+    description: "Đọc, nạp và học tri thức từ file tài liệu (PDF, DOCX, TXT, MD, YAML, JSON, CSV). File có thể được đưa vào thư mục dự án hoặc truyền đường dẫn.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        filePath: { type: "STRING", description: "Đường dẫn file tài liệu (ví dụ: 'tailieu.pdf' hoặc 'docs/pentest_guide.docx')" },
+        title: { type: "STRING", description: "Tiêu đề hoặc mô tả tài liệu (tùy chọn)" }
+      },
+      required: ["filePath"]
+    }
+  },
+  {
+    name: "queryLearnedDocuments",
+    description: "Tìm kiếm và truy xuất thông tin đã học từ các tài liệu PDF/DOCX/TXT mà người dùng đã tải lên trước đó.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        query: { type: "STRING", description: "Từ khóa hoặc câu hỏi cần tra cứu trong tài liệu" }
+      }
+    }
+  },
+  {
+    name: "learnLatestThreats",
+    description: "Tự động học và cập nhật các lỗ hổng CVE và bảo mật mới nhất từ Internet (GitHub Advisories) vào cơ sở tri thức cục bộ.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        severity: { type: "STRING", description: "Mức độ nghiêm trọng (critical, high, medium, low, all)" },
+        limit: { type: "INTEGER", description: "Số lượng lỗ hổng cần học (từ 1 đến 10)" }
+      }
+    }
+  },
+  {
+    name: "getStoredThreatIntel",
+    description: "Truy xuất danh sách lỗ hổng và mối đe dọa đã học và lưu trữ trong cơ sở tri thức cục bộ.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        query: { type: "STRING", description: "Từ khóa tìm kiếm trong cơ sở tri thức (tên CVE, tên package, mô tả)" }
+      }
+    }
   }
 ];
 
@@ -483,5 +528,9 @@ export const TOOL_HANDLERS = {
   runGobusterScan,
   runMetasploitScan,
   runKaliCommand,
+  learnFromDocument,
+  queryLearnedDocuments,
+  learnLatestThreats,
+  getStoredThreatIntel,
 };
 

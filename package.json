@@ -10,7 +10,17 @@
     "test": "node agent.mjs --test",
     "push": "git add . && git commit -m \"Update AI Agent\" && git push origin main"
   },
-  "keywords": ["ai-agent", "gemini", "free", "autonomous", "tools"],
+  "keywords": [
+    "ai-agent",
+    "gemini",
+    "free",
+    "autonomous",
+    "tools"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "mammoth": "^1.13.0",
+    "pdf-parse": "^2.4.5"
+  }
 }
