@@ -60,7 +60,7 @@ Các trụ cột kiến thức chính:
 4. Công cụ hỗ trợ:
    - listCurriculumTracks, getCurriculumLesson, auditCodeSnippet, listKaliTools.
    - runNmapScan, runNiktoScan, runSqlmapScan, runDirbScan, runGobusterScan, runMetasploitScan, runWhatWebScan, runDnsLookup, runWfuzzScan, runKaliCommand.
-   - learnFromDocument, queryLearnedDocuments, learnLatestThreats, getStoredThreatIntel.
+   - learnFromDocument, queryLearnedDocuments, learnFromUrl, learnLatestThreats, getStoredThreatIntel.
    - searchWeb, writeFile, readFile, listFiles, calculate.`
   },
   trading: {
@@ -97,7 +97,7 @@ Các trụ cột kiến thức chính:
    - calculateFibonacciLevels: Đo các mốc thoái lui (0.5, 0.618 Golden Pocket) và mở rộng chốt lời.
    - getCryptoMarketOverview: Tra cứu giá top coin (BTC, ETH, SOL, BNB...) và các chỉ số thị trường.
    - searchWeb: Tìm kiếm tin tức kinh tế vĩ mô, lịch công bố tin tức, tin tức Crypto mới nhất.
-   - learnFromDocument, queryLearnedDocuments: Đọc tài liệu, sách trading, whitepaper PDF/Word.`
+   - learnFromDocument, queryLearnedDocuments, learnFromUrl: Đọc tài liệu, sách trading, whitepaper PDF/Word hoặc từ link web online.`
   },
   dev: {
     id: "dev",
@@ -133,7 +133,7 @@ Các trụ cột kiến thức chính:
    - explainAlgorithmComplexity: Phân tích độ phức tạp Big-O và tư vấn tối ưu thuật toán.
    - generateProjectStructure: Tạo cấu trúc thư mục chuẩn Clean Architecture, MVC cho dự án.
    - auditCodeSnippet: Soát lỗi logic, phát hiện anti-patterns và đề xuất bản vá.
-   - learnFromDocument, queryLearnedDocuments: Đọc tài liệu thư viện, sách lập trình, đặc tả API PDF/Word.
+   - learnFromDocument, queryLearnedDocuments, learnFromUrl: Đọc tài liệu thư viện, sách lập trình, đặc tả API PDF/Word hoặc từ link web online.
    - writeFile, readFile, listFiles, calculate, searchWeb.`
   }
 };
@@ -432,6 +432,12 @@ async function runSelfTest() {
     testAgent.setMode("dev");
     if (testAgent.mode !== "dev") throw new Error("Dev mode switch failed");
     console.log(`${C.green}✓ OK${C.reset} (3 modes verified: pentest, trading, dev)`);
+
+    // 19. Learn from URL
+    process.stdout.write("  Testing learnFromUrl (URL Validation)... ");
+    const invalidUrlRes = JSON.parse(await TOOL_HANDLERS.learnFromUrl({ url: "invalid-url" }));
+    if (!invalidUrlRes.error) throw new Error("Expected validation error for non-http url");
+    console.log(`${C.green}✓ OK${C.reset} (Validation handler verified)`);
 
     // Clean up temporary test files
     await (await import("fs/promises")).unlink(sampleDocPath).catch(() => { });

@@ -14,7 +14,9 @@ Trợ lý & Hệ thống AI đa năng hoàn toàn miễn phí, hỗ trợ 3 ch�
   - *Kỹ nghệ phần mềm*: Clean Code, 5 nguyên lý SOLID, Design Patterns (Creational, Structural, Behavioral), tạo khung cấu trúc Clean Architecture & MVC.
   - *Fullstack Web*: TypeScript, Next.js, Node.js/Express, Python/FastAPI, Go, Database SQL (PostgreSQL index/query optimization) & NoSQL (MongoDB, Redis), Docker & CI/CD.
 
-- **Đọc hiểu tài liệu đa định dạng (Document Learning)**: Tải lên và nạp kiến thức từ file PDF, DOCX, TXT, MD vào bộ nhớ tri thức.
+- **Đọc hiểu tài liệu đa định dạng (Document Learning)**:
+  - Tải lên file nội bộ: `.pdf`, `.docx`, `.txt`, `.md`, `.yaml`, `.json`, `.csv`.
+  - **Nạp trực tiếp từ liên kết (URL Docs Learning)**: Dán link trang web tài liệu hoặc link file PDF trực tuyến (công cụ `learnFromUrl` và nút 🔗 trên Web UI) để AI tự động trích xuất và nạp vào bộ nhớ.
 - **Hoàn toàn miễn phí**: Sử dụng Google Gemini API Free Tier (tự động chuyển đổi giữa các free models khi gặp giới hạn hạn mức).
 
 ---

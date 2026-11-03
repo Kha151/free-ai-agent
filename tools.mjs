@@ -21,6 +21,7 @@ import {
   getStoredThreatIntel,
   learnFromDocument,
   queryLearnedDocuments,
+  learnFromUrl,
 } from "./knowledgeTools.mjs";
 import { listKaliTools } from "./kaliToolsCatalog.mjs";
 import {
@@ -641,6 +642,18 @@ export const TOOL_DECLARATIONS = [
         architectureStyle: { type: "STRING", description: "Kiểu kiến trúc: 'clean-architecture', 'mvc', hoặc 'modular'" }
       }
     }
+  },
+  {
+    name: "learnFromUrl",
+    description: "Tự động truy xuất, đọc hiểu và nạp toàn bộ kiến thức từ một liên kết trang web tài liệu (HTTP/HTTPS) hoặc đường dẫn file PDF trực tuyến vào bộ nhớ tri thức của AI.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        url: { type: "STRING", description: "Đường dẫn HTTP/HTTPS của trang web tài liệu hoặc file PDF trực tuyến (vd: 'https://docs.docker.com/...', 'https://example.com/whitepaper.pdf')" },
+        title: { type: "STRING", description: "Tiêu đề tùy chọn cho tài liệu" }
+      },
+      required: ["url"]
+    }
   }
 ];
 
@@ -671,6 +684,7 @@ export const TOOL_HANDLERS = {
   listKaliTools,
   learnFromDocument,
   queryLearnedDocuments,
+  learnFromUrl,
   learnLatestThreats,
   getStoredThreatIntel,
   calculatePositionSize,

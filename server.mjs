@@ -2,7 +2,7 @@ import http from "http";
 import fs from "fs/promises";
 import path from "path";
 import { AIAgent, AGENT_MODES } from "./agent.mjs";
-import { learnFromDocument } from "./knowledgeTools.mjs";
+import { learnFromDocument, learnFromUrl } from "./knowledgeTools.mjs";
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.resolve(process.cwd(), "public");
@@ -188,6 +188,34 @@ const server = http.createServer(async (req, res) => {
           filePath: path.relative(process.cwd(), savePath),
           filename,
           wordCount: learnResult.wordCount,
+          error: learnResult.error
+        }));
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 5. API Learn from URL (/api/learn-url)
+  if (req.method === "POST" && parsedUrl.pathname === "/api/learn-url") {
+    let body = "";
+    req.on("data", chunk => body += chunk);
+    req.on("end", async () => {
+      try {
+        const { url, title } = JSON.parse(body || "{}");
+        if (!url) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "URL is required." }));
+          return;
+        }
+
+        const learnResult = JSON.parse(await learnFromUrl({ url, title }));
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({
+          success: !learnResult.error,
+          result: learnResult,
           error: learnResult.error
         }));
       } catch (err) {

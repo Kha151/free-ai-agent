@@ -332,3 +332,207 @@ async function readStoredIntel() {
   }
 }
 
+/**
+ * Helper to extract clean text from HTML documentation
+ */
+function extractTextFromHtml(html) {
+  let title = "";
+  const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+  if (titleMatch) {
+    title = titleMatch[1].trim();
+  }
+
+  // Remove unwanted non-content tags
+  let clean = html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+    .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, "")
+    .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, "");
+
+  // Convert headings and blocks to newlines
+  clean = clean
+    .replace(/<\/h[1-6]>/gi, "\n\n")
+    .replace(/<\/p>/gi, "\n\n")
+    .replace(/<\/div>/gi, "\n")
+    .replace(/<\/li>/gi, "\n")
+    .replace(/<br\s*[\/]?>/gi, "\n")
+    .replace(/<\/tr>/gi, "\n");
+
+  // Strip all HTML tags
+  clean = clean.replace(/<[^>]+>/g, " ");
+
+  // Decode common HTML entities
+  clean = clean
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&mdash;/gi, "—")
+    .replace(/&ndash;/gi, "–");
+
+  // Normalize lines
+  const lines = clean
+    .split("\n")
+    .map(line => line.trim())
+    .filter(line => line.length > 0);
+
+  return {
+    title,
+    text: lines.join("\n\n")
+  };
+}
+
+/**
+ * 5. Learn & Ingest Knowledge directly from an HTTP / HTTPS Link (Web Page or Online PDF)
+ */
+export async function learnFromUrl({ url, title = "" }) {
+  await ensureKnowledgeDir();
+
+  if (!url || (!url.startsWith("http://") && !url.startsWith("https://"))) {
+    return JSON.stringify({
+      error: "Đường dẫn không hợp lệ. URL phải bắt đầu bằng 'http://' hoặc 'https://'."
+    });
+  }
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(url);
+  } catch (err) {
+    return JSON.stringify({ error: `URL không hợp lệ: ${err.message}` });
+  }
+
+  let extractedText = "";
+  let docTitle = title;
+  let detectedType = "webpage";
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,application/pdf,*/*;q=0.8"
+      },
+      signal: AbortSignal.timeout(20000)
+    });
+
+    if (!res.ok) {
+      return JSON.stringify({
+        error: `Không thể tải nội dung từ URL (${res.status} ${res.statusText}).`
+      });
+    }
+
+    const contentType = (res.headers.get("content-type") || "").toLowerCase();
+    const isPdf = contentType.includes("application/pdf") || parsedUrl.pathname.toLowerCase().endsWith(".pdf");
+
+    if (isPdf) {
+      detectedType = "online_pdf";
+      const arrayBuf = await res.arrayBuffer();
+      const buffer = Buffer.from(arrayBuf);
+
+      const pdfModule = await import("pdf-parse");
+      if (typeof pdfModule.default === "function") {
+        const pdfData = await pdfModule.default(buffer);
+        extractedText = pdfData.text || "";
+      } else if (pdfModule.PDFParse) {
+        const parser = new pdfModule.PDFParse(new Uint8Array(buffer));
+        await parser.load();
+        const pdfRes = await parser.getText();
+        extractedText = pdfRes.text || (typeof pdfRes === "string" ? pdfRes : "");
+      } else {
+        throw new Error("Không thể khởi tạo PDF parser cho URL.");
+      }
+
+      if (!docTitle) {
+        docTitle = path.basename(parsedUrl.pathname) || "Tài liệu PDF trực tuyến";
+      }
+    } else {
+      const rawText = await res.text();
+      const parsed = extractTextFromHtml(rawText);
+      extractedText = parsed.text;
+      if (!docTitle) {
+        docTitle = parsed.title || `${parsedUrl.hostname}${parsedUrl.pathname}`;
+      }
+    }
+  } catch (err) {
+    return JSON.stringify({
+      error: `Lỗi khi truy xuất và đọc nội dung từ URL '${url}': ${err.message}`
+    });
+  }
+
+  const cleanText = extractedText.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  if (!cleanText || cleanText.length < 30) {
+    return JSON.stringify({
+      error: `Không tìm thấy đủ nội dung văn bản có ý nghĩa từ '${url}' để học (có thể do trang web yêu cầu JavaScript/đăng nhập hoặc chặn crawler).`
+    });
+  }
+
+  const wordCount = cleanText.split(/\s+/).length;
+  const preview = cleanText.slice(0, 3000);
+
+  // Lưu vào documents_index.json
+  let docIndex = [];
+  try {
+    const raw = await fs.readFile(DOCUMENTS_INDEX_FILE, "utf-8");
+    docIndex = JSON.parse(raw);
+  } catch {
+    docIndex = [];
+  }
+
+  const safeHost = parsedUrl.hostname.replace(/[^a-zA-Z0-9]/g, "_");
+  const safePath = (path.basename(parsedUrl.pathname) || "index").replace(/[^a-zA-Z0-9_\-]/g, "_");
+  const docId = `url-${Date.now()}`;
+  const filename = `url_${safeHost}_${safePath.slice(0, 30)}.md`;
+
+  const newDocEntry = {
+    id: docId,
+    title: docTitle,
+    url: url,
+    sourceType: detectedType,
+    filePath: `knowledge/documents/${filename}`,
+    wordCount,
+    learnedAt: new Date().toISOString(),
+    excerpt: cleanText.slice(0, 500) + (cleanText.length > 500 ? "..." : "")
+  };
+
+  // Cập nhật hoặc thêm mới
+  const existingIndex = docIndex.findIndex(d => d.url === url);
+  if (existingIndex >= 0) {
+    docIndex[existingIndex] = newDocEntry;
+  } else {
+    docIndex.push(newDocEntry);
+  }
+
+  await fs.writeFile(DOCUMENTS_INDEX_FILE, JSON.stringify(docIndex, null, 2), "utf-8");
+
+  // Lưu bản tóm tắt markdown vào knowledge/documents/
+  const docStoreDir = path.join(KNOWLEDGE_DIR, "documents");
+  await fs.mkdir(docStoreDir, { recursive: true });
+  const markdownPath = path.join(docStoreDir, filename);
+
+  const markdownContent = `# Tài Liệu Học Từ Link: ${docTitle}
+- **Nguồn URL**: [${url}](${url})
+- **Loại tài liệu**: \`${detectedType}\`
+- **Số từ**: ~${wordCount} từ
+- **Thời gian nạp**: ${newDocEntry.learnedAt}
+
+## Nội dung trích xuất
+\`\`\`text
+${cleanText.slice(0, 10000)}
+${cleanText.length > 10000 ? "\n... (nội dung tiếp tục được lưu trong bộ nhớ) ..." : ""}
+\`\`\`
+`;
+  await fs.writeFile(markdownPath, markdownContent, "utf-8");
+
+  return JSON.stringify({
+    status: "SUCCESS",
+    message: `Đã truy xuất, đọc hiểu và nạp thành công kiến thức từ liên kết '${docTitle}' vào bộ nhớ của Khakhapkhun AI.`,
+    url,
+    title: docTitle,
+    type: detectedType,
+    wordCount,
+    savedTo: path.relative(process.cwd(), markdownPath),
+    contentPreview: preview.slice(0, 1500)
+  });
+}
+
