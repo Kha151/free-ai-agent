@@ -27,10 +27,21 @@ export async function learnFromDocument({ filePath, title = "" }) {
 
   try {
     if (ext === ".pdf") {
-      const pdfParse = (await import("pdf-parse")).default;
+      const pdfModule = await import("pdf-parse");
       const dataBuffer = await fs.readFile(resolvedPath);
-      const pdfData = await pdfParse(dataBuffer);
-      extractedText = pdfData.text || "";
+
+      // Hỗ trợ cả pdf-parse v2 (class PDFParse) lẫn v1 (function default)
+      if (typeof pdfModule.default === "function") {
+        const pdfData = await pdfModule.default(dataBuffer);
+        extractedText = pdfData.text || "";
+      } else if (pdfModule.PDFParse) {
+        const parser = new pdfModule.PDFParse(new Uint8Array(dataBuffer));
+        await parser.load();
+        const res = await parser.getText();
+        extractedText = res.text || (typeof res === "string" ? res : "");
+      } else {
+        throw new Error("Không thể khởi tạo parser PDF.");
+      }
     } else if (ext === ".docx") {
       const mammoth = (await import("mammoth")).default;
       const result = await mammoth.extractRawText({ path: resolvedPath });
