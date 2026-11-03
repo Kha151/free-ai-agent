@@ -63,6 +63,16 @@ def list_files(directory: str = ".") -> str:
 
 # --- Main Agent Loop ---
 
+# Free Models fallback list on Google AI Studio
+FREE_MODELS = [
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
+]
+
 def main():
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
@@ -85,16 +95,29 @@ def main():
 
     tools = [search_web, calculate, write_file, read_file, list_files]
 
-    chat = client.chats.create(
-        model="gemini-3.1-flash-lite",
-        config=types.GenerateContentConfig(
-            system_instruction=system_instruction,
-            tools=tools,
-            temperature=0.2,
-        ),
-    )
+    chat = None
+    current_model = None
+    for model_name in FREE_MODELS:
+        try:
+            chat = client.chats.create(
+                model=model_name,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    tools=tools,
+                    temperature=0.2,
+                ),
+            )
+            current_model = model_name
+            break
+        except Exception as e:
+            print(f"⚠️ Model {model_name} không khả dụng: {e}. Đang thử model tiếp theo...")
 
-    print("\n🛡️ Gia sư AI Pentest & DevSecOps đã sẵn sàng! Gõ 'exit' hoặc 'thoat' để thoát.\n" + "-" * 55)
+    if not chat:
+        print("❌ Không thể khởi tạo với bất kỳ Free Model nào.")
+        sys.exit(1)
+
+    print(f"\n🛡️ Gia sư AI Pentest & DevSecOps đã sẵn sàng! (Mô hình: {current_model})")
+    print("Gõ 'exit' hoặc 'thoat' để thoát.\n" + "-" * 55)
     while True:
         try:
             user_input = input("\nBạn: ").strip()
@@ -104,8 +127,28 @@ def main():
             if not user_input:
                 continue
 
-            response = chat.send_message(user_input)
-            print(f"\nGia sư AI: {response.text}")
+            # Tự động chuyển model nếu gặp lỗi rate limit / model bận
+            sent = False
+            for model_name in FREE_MODELS:
+                try:
+                    response = chat.send_message(user_input)
+                    print(f"\nGia sư AI: {response.text}")
+                    sent = True
+                    break
+                except Exception as e:
+                    print(f"⚠️ Model {current_model} gặp lỗi ({e}). Đang tự chuyển sang model: {model_name}...")
+                    current_model = model_name
+                    chat = client.chats.create(
+                        model=model_name,
+                        config=types.GenerateContentConfig(
+                            system_instruction=system_instruction,
+                            tools=tools,
+                            temperature=0.2,
+                        ),
+                    )
+
+            if not sent:
+                print("\n❌ Không thể nhận phản hồi từ các free models. Vui lòng thử lại sau.")
         except Exception as e:
             print(f"\nLỗi: {e}")
 

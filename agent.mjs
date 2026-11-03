@@ -13,10 +13,14 @@ const C = {
   dim: "\x1b[2m",
 };
 
+// Danh sách các model miễn phí trên Google AI Studio (ưu tiên các model nhanh, nhẹ và hạn mức cao nhất)
 const DEFAULT_MODELS = [
-  "gemini-3.1-flash-lite",
-  "gemini-3.8-flash",
-  "gemini-flash-latest",
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-2.0-flash",
+  "gemini-2.0-flash-lite",
+  "gemini-1.5-flash",
+  "gemini-1.5-flash-8b",
 ];
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
@@ -25,6 +29,7 @@ class AIAgent {
     this.apiKey = apiKey;
     this.history = [];
     this.activeModel = DEFAULT_MODELS[0];
+    this.modelIndex = 0;
     this.systemInstruction = {
       parts: [
         {
@@ -55,6 +60,8 @@ Các trụ cột kiến thức chính:
    - listCurriculumTracks: Xem danh sách các track học tập.
    - getCurriculumLesson: Lấy bài học chi tiết theo module (ví dụ: pt-101, pt-102, secops-201, secops-202, cloud-301).
    - auditCodeSnippet: Kiểm tra bảo mật mã nguồn hoặc Dockerfile.
+   - runNmapScan, runNiktoScan, runSqlmapScan, runDirbScan, runGobusterScan, runMetasploitScan, runKaliCommand.
+   - learnLatestThreats, getStoredThreatIntel.
    - searchWeb, writeFile, readFile, listFiles, calculate.`,
         },
       ],
@@ -64,7 +71,10 @@ Các trụ cột kiến thức chính:
   async callGemini(contents) {
     let lastError = null;
 
-    for (const model of DEFAULT_MODELS) {
+    // Duyệt qua danh sách các free models, bắt đầu từ modelIndex hiện tại
+    for (let i = 0; i < DEFAULT_MODELS.length; i++) {
+      const idx = (this.modelIndex + i) % DEFAULT_MODELS.length;
+      const model = DEFAULT_MODELS[idx];
       const url = `${API_BASE}/${model}:generateContent?key=${this.apiKey}`;
       const payload = {
         systemInstruction: this.systemInstruction,
@@ -84,24 +94,30 @@ Các trụ cột kiến thức chính:
         });
 
         if (res.ok) {
+          if (this.activeModel !== model) {
+            console.log(`\n  ${C.yellow}🔄 Đã tự động chuyển sang Model miễn phí: ${C.bold}${model}${C.reset}`);
+          }
           this.activeModel = model;
+          this.modelIndex = idx;
           return await res.json();
         }
 
         const errText = await res.text();
-        // If busy, rate-limited, or deprecated, try next model
-        if (res.status === 503 || res.status === 404 || res.status === 429) {
+        // Khi model bị Rate Limit (429), quá tải (503, 500), hoặc không hỗ trợ / deprecated (404, 400)
+        if ([429, 503, 500, 404, 400].includes(res.status)) {
+          console.log(`\n  ${C.yellow}⚠️ Model ${model} gặp mã lỗi (${res.status}). Đang tự động thử model miễn phí tiếp theo...${C.reset}`);
           lastError = new Error(`Model ${model} (${res.status}): ${errText}`);
           continue;
         }
 
         throw new Error(`Gemini API error (${res.status}): ${errText}`);
       } catch (err) {
+        console.log(`\n  ${C.yellow}⚠️ Lỗi kết nối model ${model}: ${err.message}. Đang tự động chuyển model...${C.reset}`);
         lastError = err;
       }
     }
 
-    throw lastError || new Error("Failed to communicate with Gemini API models.");
+    throw lastError || new Error("Tất cả các model miễn phí hiện tại đều đang bận hoặc vượt quota. Vui lòng thử lại sau giây lát.");
   }
 
   async processUserMessage(userText) {
