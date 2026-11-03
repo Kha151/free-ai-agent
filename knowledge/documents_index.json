@@ -1,11 +1,11 @@
 [
   {
-    "id": "doc-1793699533195",
+    "id": "doc-1793699881850",
     "title": "Test API Security Guide",
     "filePath": "test_pentest_notes.md",
     "extension": ".md",
     "wordCount": 9,
-    "learnedAt": "2026-11-03T09:52:13.196Z",
+    "learnedAt": "2026-11-03T09:58:01.850Z",
     "excerpt": "# OWASP API Security\nCheck BOLA and Broken Authentication."
   },
   {
@@ -70,5 +70,15 @@
     "wordCount": 3369,
     "learnedAt": "2026-11-03T08:43:07.029Z",
     "excerpt": "FlashArray//XR2 and //XR3 Quick Installation Guide\nBefore You Begin\nRecommended clearance for the front (cold aisle) is 91.5 cm\n(36 in.). The minimum requirement is 81.5 cm (32 in.).\nRecommended clearance for the rear (hot aisle) is 91.5 cm\n(36 in.). The minimum requirement is 61 cm (24 in.).\nNo special clearance is required on top, bottom, or sides.\nRecommended clearance for rack posts is 74 cm (29 in.) (the\ndefault on most racks). Minimum is 61 cm (24 in.), Maximum\nis 81.25 cm (32 in.).\nDocume..."
+  },
+  {
+    "id": "url-1793699750378",
+    "title": "Skyhigh Security Documentation",
+    "url": "https://success.skyhighsecurity.com/docs",
+    "sourceType": "webpage",
+    "filePath": "knowledge/documents/url_success_skyhighsecurity_com_docs.md",
+    "wordCount": 65,
+    "learnedAt": "2026-11-03T09:55:50.378Z",
+    "excerpt": "Start Here with Skyhigh Security\n\nDocumentation Index\n\nFetch the complete documentation index at:  https://success.skyhighsecurity.com/llms.txt\n\nUse this file to discover all available pages before exploring further.\n\nSkip to main content\n\nSupport\n\nStatus\n\nPartners\n\nContact us\n\nRelease Notes\n\nAuto (System theme)    Light    Dark\n\nLogin\n\nSearch\n\nCTRL+K\n\nPress CTRL+K to open search\n\nPowered by\n\nPrivacy    |\n\nLegal Terms of Service    |\n\nLegal    |     Copyright ©2026 Musarubra US LLC"
   }
 ]
