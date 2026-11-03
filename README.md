@@ -1,6 +1,6 @@
-# 🛡️ Gia Sư AI: Pentest & DevSecOps (Tiếng Việt)
+# 🛡️ Khakhapkhun AI: Pentest & DevSecOps (Tiếng Việt)
 
-Trợ lý & Gia sư AI hoàn toàn miễn phí, hỗ trợ đào tạo chuyên sâu về **Kiểm thử thâm nhập (Penetration Testing / Ethical Hacking)** và **Tự động hóa bảo mật CI/CD (DevSecOps)** bằng **Tiếng Việt**.
+Trợ lý & Khakhapkhun AI hoàn toàn miễn phí, hỗ trợ đào tạo chuyên sâu về **Kiểm thử thâm nhập (Penetration Testing / Ethical Hacking)** và **Tự động hóa bảo mật CI/CD (DevSecOps)** bằng **Tiếng Việt**.
 
 - **Phương pháp đào tạo 2 chiều (Dual-Perspective)**:
   - *Góc nhìn Tấn công (Pentest)*: Hiểu cách hacker thu thập thông tin (Recon), khai thác lỗ hổng Web (OWASP Top 10) và leo thang đặc quyền (PrivEsc).
@@ -59,7 +59,7 @@ npm test
 
 ---
 
-## 💡 Gợi Ý Câu Hỏi Cho Gia Sư AI:
+## 💡 Gợi Ý Câu Hỏi Cho Khakhapkhun AI:
 - *"Hãy liệt kê tất cả các track học và gợi ý lộ trình bắt đầu cho người mới."*
 - *"Hãy dạy tôi module secops-201 và hướng dẫn cấu hình Gitleaks trong GitHub Actions."*
 - *"Kiểm tra bảo mật file Dockerfile này giúp tôi: FROM node:latest \n USER root"*

@@ -37,5 +37,70 @@
     "pentestAngle": "Khai thác phiên bản chưa vá của Multiple packages qua vector: Permission control vulnerability in the event notification management module.\nImpact: Successful...",
     "devSecOpsFix": "Cập nhật package Multiple packages lên bản vá Check advisory và kích hoạt SCA scanner (Trivy/Snyk) để chặn build.",
     "learnedAt": "2026-11-02T09:31:50.787Z"
+  },
+  {
+    "cveId": "CVE-2026-120534",
+    "ghsaId": "GHSA-v5v5-hmcv-q4fc",
+    "severity": "CRITICAL",
+    "package": "Multiple packages",
+    "ecosystem": "OpenSource",
+    "summary": "The Advanced Custom Fields: Extended PRO plugin for WordPress is vulnerable to Limited Code...",
+    "patchedVersions": "Check advisory",
+    "publishedAt": "2026-11-03T06:31:12Z",
+    "pentestAngle": "Khai thác phiên bản chưa vá của Multiple packages qua vector: The Advanced Custom Fields: Extended PRO plugin for WordPress is vulnerable to Limited Code...",
+    "devSecOpsFix": "Cập nhật package Multiple packages lên bản vá Check advisory và kích hoạt SCA scanner (Trivy/Snyk) để chặn build.",
+    "learnedAt": "2026-11-03T09:14:23.391Z"
+  },
+  {
+    "cveId": "CVE-2026-120518",
+    "ghsaId": "GHSA-cjfm-vrh6-rjxq",
+    "severity": "CRITICAL",
+    "package": "Multiple packages",
+    "ecosystem": "OpenSource",
+    "summary": "The BuddyPress XProfile Image Field plugin for WordPress is vulnerable to arbitrary file deletion...",
+    "patchedVersions": "Check advisory",
+    "publishedAt": "2026-11-03T06:31:12Z",
+    "pentestAngle": "Khai thác phiên bản chưa vá của Multiple packages qua vector: The BuddyPress XProfile Image Field plugin for WordPress is vulnerable to arbitrary file deletion...",
+    "devSecOpsFix": "Cập nhật package Multiple packages lên bản vá Check advisory và kích hoạt SCA scanner (Trivy/Snyk) để chặn build.",
+    "learnedAt": "2026-11-03T09:14:23.391Z"
+  },
+  {
+    "cveId": "CVE-2026-86596",
+    "ghsaId": "GHSA-9wfw-qq7f-66hm",
+    "severity": "CRITICAL",
+    "package": "Multiple packages",
+    "ecosystem": "OpenSource",
+    "summary": "The s2Member plugin for WordPress is vulnerable to Remote Code Execution in all versions up to,...",
+    "patchedVersions": "Check advisory",
+    "publishedAt": "2026-11-03T00:31:24Z",
+    "pentestAngle": "Khai thác phiên bản chưa vá của Multiple packages qua vector: The s2Member plugin for WordPress is vulnerable to Remote Code Execution in all versions up to,...",
+    "devSecOpsFix": "Cập nhật package Multiple packages lên bản vá Check advisory và kích hoạt SCA scanner (Trivy/Snyk) để chặn build.",
+    "learnedAt": "2026-11-03T09:14:23.391Z"
+  },
+  {
+    "cveId": "CVE-2026-97718",
+    "ghsaId": "GHSA-g239-47xv-3894",
+    "severity": "CRITICAL",
+    "package": "Multiple packages",
+    "ecosystem": "OpenSource",
+    "summary": "CVE-2026-97718 Is a cross-site request forgery vulnerability\nin version 14.60 of the Secure...",
+    "patchedVersions": "Check advisory",
+    "publishedAt": "2026-11-02T21:32:05Z",
+    "pentestAngle": "Khai thác phiên bản chưa vá của Multiple packages qua vector: CVE-2026-97718 Is a cross-site request forgery vulnerability\nin version 14.60 of the Secure...",
+    "devSecOpsFix": "Cập nhật package Multiple packages lên bản vá Check advisory và kích hoạt SCA scanner (Trivy/Snyk) để chặn build.",
+    "learnedAt": "2026-11-03T09:14:23.391Z"
+  },
+  {
+    "cveId": "CVE-2026-102435",
+    "ghsaId": "GHSA-68fh-vvhf-6vfx",
+    "severity": "CRITICAL",
+    "package": "Multiple packages",
+    "ecosystem": "OpenSource",
+    "summary": "The Ultra Addons for Contact Form 7 plugin for WordPress is vulnerable to arbitrary file deletion...",
+    "patchedVersions": "Check advisory",
+    "publishedAt": "2026-11-02T21:31:58Z",
+    "pentestAngle": "Khai thác phiên bản chưa vá của Multiple packages qua vector: The Ultra Addons for Contact Form 7 plugin for WordPress is vulnerable to arbitrary file deletion...",
+    "devSecOpsFix": "Cập nhật package Multiple packages lên bản vá Check advisory và kích hoạt SCA scanner (Trivy/Snyk) để chặn build.",
+    "learnedAt": "2026-11-03T09:14:23.391Z"
   }
 ]

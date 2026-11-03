@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gia Sư AI - Pentest & DevSecOps</title>
+  <title>Khakhapkhun AI - Pentest & DevSecOps</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -144,7 +147,8 @@
       transition: background 0.2s;
     }
 
-    .history-item:hover, .history-item.active {
+    .history-item:hover,
+    .history-item.active {
       background: var(--bg-tertiary);
       color: var(--text-primary);
     }
@@ -241,7 +245,7 @@
       justify-content: center;
       font-size: 18px;
       flex-shrink: 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
 
     .avatar.user {
@@ -262,7 +266,9 @@
       overflow-wrap: break-word;
     }
 
-    .message-content h1, .message-content h2, .message-content h3 {
+    .message-content h1,
+    .message-content h2,
+    .message-content h3 {
       margin: 16px 0 8px;
       font-weight: 600;
     }
@@ -295,7 +301,8 @@
       padding: 0;
     }
 
-    .message-content ul, .message-content ol {
+    .message-content ul,
+    .message-content ol {
       margin: 8px 0 12px 20px;
     }
 
@@ -509,12 +516,25 @@
       animation: bounce 1.4s infinite ease-in-out both;
     }
 
-    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    .typing-dot:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: -0.16s;
+    }
 
     @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0); }
-      40% { transform: scale(1); }
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0);
+      }
+
+      40% {
+        transform: scale(1);
+      }
     }
 
     /* Modal upload file */
@@ -523,6 +543,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- Left Sidebar (ChatGPT/Gemini Style) -->
@@ -530,7 +551,7 @@
     <div class="sidebar-header">
       <div class="logo-container">
         <span class="logo-icon">🛡️</span>
-        <span class="logo-text">Gia Sư AI</span>
+        <span class="logo-text">Khakhapkhun AI</span>
       </div>
     </div>
 
@@ -557,7 +578,9 @@
       </button>
     </div>
 
-    <div style="padding: 10px 16px 4px; font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Lịch sử hội thoại</div>
+    <div
+      style="padding: 10px 16px 4px; font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">
+      Lịch sử hội thoại</div>
     <div class="chat-history-list" id="chatHistoryList">
       <div class="history-item active">Phiên học hiện tại</div>
     </div>
@@ -575,7 +598,7 @@
   <main class="main-container">
     <header class="top-header">
       <div class="model-selector">
-        <span>Gia Sư AI: Pentest & DevSecOps</span>
+        <span>Khakhapkhun AI: Pentest & DevSecOps</span>
         <span class="model-badge" id="activeModelBadge">gemini-3.1-flash-lite</span>
       </div>
       <div style="display: flex; gap: 10px;">
@@ -588,11 +611,13 @@
       <div class="hero-container" id="heroScreen">
         <h1 class="hero-title">Tôi có thể giúp gì cho bạn hôm nay?</h1>
         <p class="hero-subtitle">
-          Gia sư AI chuyên về <strong>Kiểm thử thâm nhập (Offensive Pentest)</strong> và <strong>Tự động hóa an toàn DevSecOps (Shift-Left)</strong>. Hỗ trợ chạy tool trong Kali Linux và đọc tài liệu PDF/Word.
+          Khakhapkhun AI chuyên về <strong>Kiểm thử thâm nhập (Offensive Pentest)</strong> và <strong>Tự động hóa an toàn
+            DevSecOps (Shift-Left)</strong>. Hỗ trợ chạy tool trong Kali Linux và đọc tài liệu PDF/Word.
         </p>
 
         <div class="suggestion-grid">
-          <div class="suggestion-card" onclick="sendPrompt('Hướng dẫn tôi cách khai thác và khắc phục lỗ hổng SQL Injection')">
+          <div class="suggestion-card"
+            onclick="sendPrompt('Hướng dẫn tôi cách khai thác và khắc phục lỗ hổng SQL Injection')">
             <div class="suggestion-title">💉 Phân tích SQL Injection</div>
             <div class="suggestion-desc">Góc nhìn Pentester khai thác và DevSecOps vá code</div>
           </div>
@@ -600,11 +625,13 @@
             <div class="suggestion-title">🐉 Công cụ Kali Web</div>
             <div class="suggestion-desc">Nikto, WhatWeb, Dirb, Wfuzz kèm lệnh thực thi</div>
           </div>
-          <div class="suggestion-card" onclick="sendPrompt('Kiểm tra đoạn mã sau xem có lỗi Command Injection không:\n\nconst cmd = `ping ${req.query.ip}`; exec(cmd);')">
+          <div class="suggestion-card"
+            onclick="sendPrompt('Kiểm tra đoạn mã sau xem có lỗi Command Injection không:\n\nconst cmd = `ping ${req.query.ip}`; exec(cmd);')">
             <div class="suggestion-title">🔍 Audit bảo mật mã nguồn</div>
             <div class="suggestion-desc">Phát hiện CWE-78 và đề xuất quy tắc SAST Semgrep</div>
           </div>
-          <div class="suggestion-card" onclick="sendPrompt('Giải thích quy trình Shift-Left và các công cụ quét tự động trong CI/CD')">
+          <div class="suggestion-card"
+            onclick="sendPrompt('Giải thích quy trình Shift-Left và các công cụ quét tự động trong CI/CD')">
             <div class="suggestion-title">🚀 Triển khai DevSecOps</div>
             <div class="suggestion-desc">Gitleaks, Semgrep, Trivy trong GitHub Actions</div>
           </div>
@@ -617,21 +644,20 @@
       <div class="input-wrapper">
         <div class="file-preview-bar" id="filePreviewBar">
           <span id="filePreviewText">📄 File: sample.pdf</span>
-          <button style="background:none; border:none; color:var(--text-muted); cursor:pointer;" onclick="clearUploadedFile()">✕</button>
+          <button style="background:none; border:none; color:var(--text-muted); cursor:pointer;"
+            onclick="clearUploadedFile()">✕</button>
         </div>
 
         <div class="input-controls">
-          <button class="action-btn" title="Tải file PDF, DOCX, TXT để học" onclick="document.getElementById('fileUploadInput').click()">
+          <button class="action-btn" title="Tải file PDF, DOCX, TXT để học"
+            onclick="document.getElementById('fileUploadInput').click()">
             📎
           </button>
-          <input type="file" id="fileUploadInput" class="file-input-hidden" accept=".pdf,.docx,.txt,.md,.yaml,.yml,.json,.csv" onchange="handleFileSelect(event)">
+          <input type="file" id="fileUploadInput" class="file-input-hidden"
+            accept=".pdf,.docx,.txt,.md,.yaml,.yml,.json,.csv" onchange="handleFileSelect(event)">
 
-          <textarea 
-            id="chatInput" 
-            class="chat-textarea" 
-            rows="1" 
-            placeholder="Hỏi về Pentest, DevSecOps, lệnh Kali, hoặc upload tài liệu..." 
-            oninput="autoResize(this)" 
+          <textarea id="chatInput" class="chat-textarea" rows="1"
+            placeholder="Hỏi về Pentest, DevSecOps, lệnh Kali, hoặc upload tài liệu..." oninput="autoResize(this)"
             onkeydown="handleKeyDown(event)"></textarea>
 
           <button id="sendBtn" class="btn-send" onclick="sendMessage()">
@@ -640,7 +666,7 @@
         </div>
       </div>
       <div class="input-footer">
-        Gia Sư AI có thể mắc sai sót. Luôn tuân thủ quy tắc đạo đức và chỉ kiểm thử trên hệ thống có văn bản cấp phép.
+        Khakhapkhun AI có thể mắc sai sót. Luôn tuân thủ quy tắc đạo đức và chỉ kiểm thử trên hệ thống có văn bản cấp phép.
       </div>
     </div>
   </main>
@@ -673,7 +699,7 @@
         <div class="hero-container" id="heroScreen">
           <h1 class="hero-title">Tôi có thể giúp gì cho bạn hôm nay?</h1>
           <p class="hero-subtitle">
-            Gia sư AI chuyên về <strong>Kiểm thử thâm nhập (Offensive Pentest)</strong> và <strong>Tự động hóa an toàn DevSecOps (Shift-Left)</strong>. Hỗ trợ chạy tool trong Kali Linux và đọc tài liệu PDF/Word.
+            Khakhapkhun AI chuyên về <strong>Kiểm thử thâm nhập (Offensive Pentest)</strong> và <strong>Tự động hóa an toàn DevSecOps (Shift-Left)</strong>. Hỗ trợ chạy tool trong Kali Linux và đọc tài liệu PDF/Word.
           </p>
           <div class="suggestion-grid">
             <div class="suggestion-card" onclick="sendPrompt('Hướng dẫn tôi cách khai thác và khắc phục lỗ hổng SQL Injection')">
@@ -842,4 +868,5 @@
     }
   </script>
 </body>
+
 </html>

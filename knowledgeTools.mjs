@@ -105,7 +105,7 @@ export async function learnFromDocument({ filePath, title = "" }) {
   await fs.mkdir(docStoreDir, { recursive: true });
   const safeDocName = path.basename(resolvedPath, ext).replace(/[^a-zA-Z0-9_\-]/g, "_");
   const markdownPath = path.join(docStoreDir, `${safeDocName}.md`);
-  
+
   const markdownContent = `# Tài Liệu Đã Học: ${docTitle}
 - **File gốc**: \`${newDocEntry.filePath}\`
 - **Định dạng**: \`${ext}\`
@@ -122,7 +122,7 @@ ${cleanText.length > 8000 ? "\n... (nội dung tiếp tục được lưu trong 
 
   return JSON.stringify({
     status: "SUCCESS",
-    message: `Đã phân tích, đọc hiểu và nạp thành công tài liệu '${docTitle}' vào bộ nhớ tri thức của Gia Sư AI.`,
+    message: `Đã phân tích, đọc hiểu và nạp thành công tài liệu '${docTitle}' vào bộ nhớ tri thức của Khakhapkhun AI.`,
     file: newDocEntry.filePath,
     wordCount,
     savedTo: path.relative(process.cwd(), markdownPath),
@@ -171,7 +171,7 @@ export async function queryLearnedDocuments({ query = "" }) {
     try {
       const mdFile = path.join(docStoreDir, `${path.basename(doc.filePath, doc.extension).replace(/[^a-zA-Z0-9_\-]/g, "_")}.md`);
       fullText = await fs.readFile(mdFile, "utf-8");
-    } catch {}
+    } catch { }
 
     if (
       doc.title.toLowerCase().includes(cleanQ) ||
@@ -201,7 +201,7 @@ export async function learnLatestThreats({ severity = "all", limit = 5 }) {
 
   const maxItems = Math.min(Math.max(limit, 1), 10);
   const severityFilter = severity.toLowerCase();
-  
+
   let url = `https://api.github.com/advisories?per_page=${maxItems * 2}`;
   if (["critical", "high", "medium", "low"].includes(severityFilter)) {
     url += `&severity=${severityFilter}`;

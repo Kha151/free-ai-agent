@@ -165,8 +165,9 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\n======================================================`);
-  console.log(`   🌐 Gia Sư AI Web App (Gemini / ChatGPT Style)`);
+  console.log(`   🌐 Khakhapkhun AI Web App (Gemini / ChatGPT Style)`);
   console.log(`   URL: http://localhost:${PORT}`);
   console.log(`   Mô hình khởi động: ${agent.activeModel}`);
   console.log(`======================================================\n`);
 });
+

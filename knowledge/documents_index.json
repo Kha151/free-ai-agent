@@ -1,0 +1,74 @@
+[
+  {
+    "id": "doc-1793697908639",
+    "title": "Test API Security Guide",
+    "filePath": "test_pentest_notes.md",
+    "extension": ".md",
+    "wordCount": 9,
+    "learnedAt": "2026-11-03T09:25:08.639Z",
+    "excerpt": "# OWASP API Security\nCheck BOLA and Broken Authentication."
+  },
+  {
+    "id": "doc-1793671145877",
+    "title": "Tài liệu bảo mật API mẫu",
+    "filePath": "sample_api_security.md",
+    "extension": ".md",
+    "wordCount": 101,
+    "learnedAt": "2026-11-03T01:59:05.877Z",
+    "excerpt": "# Hướng Dẫn Kiểm Thử Bảo Mật API (OWASP API Security)\n\n## 1. Lỗ hổng BOLA (Broken Object Level Authorization)\n- Khái niệm: Xảy ra khi API endpoint không kiểm tra quyền sở hữu đối tượng dựa trên user ID gửi lên.\n- Pentest: Thay đổi id người dùng trên URL `/api/v1/users/{id}/profile` để đọc thông tin người dùng khác.\n- DevSecOps: Luôn kiểm tra `session.user.id === requested.user.id` trong middleware xác thực.\n\n## 2. Lỗ hổng Broken Authentication\n- Thiếu giới hạn số lần thử đăng nhập (Rate limit).\n..."
+  },
+  {
+    "id": "doc-1793694961907",
+    "title": "API_SECURITY.pdf",
+    "filePath": "knowledge\\uploads\\API_SECURITY.pdf",
+    "extension": ".pdf",
+    "wordCount": 2419,
+    "learnedAt": "2026-11-03T08:36:01.907Z",
+    "excerpt": "API SECURITY\nThe Complete, Proactive API Security Platform\n\n-- 1 of 8 --\n\nTable of contents\nUser Interface Admin Guide > Managing UI Users\nManaging Teams, Users, and Service Accounts\nOverview\nManaging Teams\nManaging Users\nSaaS Support Email Addresses\nAdding Users\nManaging Users\nManaging Service Accounts\nService Account Access\nActions for Service Accounts\nCopying Your Client ID and Secret\nGenerating a Service Account Access Token\nSystem Service Accounts\n3\n3\n3\n4\n4\n4\n5\n6\n6\n6\n6\n7\n7\n© Copyri ght 2026..."
+  },
+  {
+    "id": "doc-1793695325096",
+    "title": "FA_XR4 Quick Installation Guide",
+    "filePath": "knowledge\\uploads\\FA_XR4_Quick_Installation_Guide.pdf",
+    "extension": ".pdf",
+    "wordCount": 3070,
+    "learnedAt": "2026-11-03T08:42:05.096Z",
+    "excerpt": "FlashArray//XR4 Quick Installation Guide\n50-0091-00\npurestorage.com\n\n-- 1 of 18 --\n\n© 2024 Pure Storage, the Pure P Logo, and the marks on the Pure Trademark List at\nhttps://www.purestorage.com/legal/productenduserinfo.html are trademarks of Pure Storage, Inc. Other names are trademarks of\ntheir respective owners..\nThe Pure Storage products and programs described in this documentation are distributed under a license agreement restricting\nthe use, copying, distribution, and decompilation/reverse ..."
+  },
+  {
+    "id": "doc-1793695397987",
+    "title": "FlashArray Safety and Compliance Guide",
+    "filePath": "knowledge\\uploads\\50-0115-03.pdf",
+    "extension": ".pdf",
+    "wordCount": 3017,
+    "learnedAt": "2026-11-03T08:43:17.987Z",
+    "excerpt": "FlashArray//E Quick Installation Guide\n50-0115-03\npurestorage.com\n\n-- 1 of 18 --\n\n© 2024 Pure Storage, the Pure P Logo, and the marks on the Pure Trademark List at\nhttps://www.purestorage.com/legal/productenduserinfo.html are trademarks of Pure Storage, Inc. Other names are trademarks of\ntheir respective owners..\nThe Pure Storage products and programs described in this documentation are distributed under a license agreement restricting\nthe use, copying, distribution, and decompilation/reverse en..."
+  },
+  {
+    "id": "doc-1793695359488",
+    "title": "General FlashArray Hardware Reference Knowledge",
+    "filePath": "knowledge\\uploads\\general_flasharray_hardware_reference_knowledge_for_a_first_new_install_2025-04-11-17-16-10.pdf",
+    "extension": ".pdf",
+    "wordCount": 2268,
+    "learnedAt": "2026-11-03T08:42:39.488Z",
+    "excerpt": "Knowledge for a First\nNew Install\nGenerated on: 11 April 2025\n1\n\n-- 1 of 9 --\n\nContents\nKnowledge for a First New Install . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3\nPrerequisites . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3\nSupport Email Template . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3\nPreparation . ...."
+  },
+  {
+    "id": "doc-1793695374549",
+    "title": "Purity//FA Upgrades: Changing Purity//FA Version",
+    "filePath": "knowledge\\uploads\\purity__fa_upgrades_changing_purity__fa_version_2025-04-11-17-12-45.pdf",
+    "extension": ".pdf",
+    "wordCount": 949,
+    "learnedAt": "2026-11-03T08:42:54.549Z",
+    "excerpt": "Changing Purity//FA\nVersion\nGenerated on: 11 April 2025\n1\n\n-- 1 of 6 --\n\nContents\nChanging Purity//FA Version . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3\n©2025 Copyright Pure Storage. All right reserved\n2\n\n-- 2 of 6 --\n\nChanging Purity//FA Version\nWhen a new array is received on-site, the Purity//FA version may not match the version that we want to\nrun on the customer site. This procedure is performed after the array has bee..."
+  },
+  {
+    "id": "doc-1793695387029",
+    "title": "Quick Installation Guide (General)",
+    "filePath": "knowledge\\uploads\\Quick_Installation_Guide.pdf",
+    "extension": ".pdf",
+    "wordCount": 3369,
+    "learnedAt": "2026-11-03T08:43:07.029Z",
+    "excerpt": "FlashArray//XR2 and //XR3 Quick Installation Guide\nBefore You Begin\nRecommended clearance for the front (cold aisle) is 91.5 cm\n(36 in.). The minimum requirement is 81.5 cm (32 in.).\nRecommended clearance for the rear (hot aisle) is 91.5 cm\n(36 in.). The minimum requirement is 61 cm (24 in.).\nNo special clearance is required on top, bottom, or sides.\nRecommended clearance for rack posts is 74 cm (29 in.) (the\ndefault on most racks). Minimum is 61 cm (24 in.), Maximum\nis 81.25 cm (32 in.).\nDocume..."
+  }
+]

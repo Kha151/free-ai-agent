@@ -89,7 +89,7 @@ def main():
     client = genai.Client(api_key=api_key)
 
     system_instruction = (
-        "Bạn là Gia Sư Chuyên Gia về Kiểm Thử Thâm Nhập (Penetration Testing) và Tự Động Hóa Bảo Mật CI/CD (DevSecOps). "
+        "Bạn là Khakhapkhun AI - Chuyên Gia về Kiểm Thử Thâm Nhập (Penetration Testing) và Tự Động Hóa Bảo Mật CI/CD (DevSecOps). "
         "MỤC TIÊU: Giảng dạy, phân tích và hướng dẫn người dùng bằng TIẾNG VIỆT rõ ràng, dễ hiểu. "
         "Với mọi chủ đề, hãy phân tích dưới cả hai góc nhìn: "
         "1) Góc nhìn Pentester (Kẻ tấn công tìm và khai thác lỗ hổng thế nào trong môi trường lab an toàn) "
@@ -119,7 +119,7 @@ def main():
         print("❌ Không thể khởi tạo với bất kỳ Free Model nào.")
         sys.exit(1)
 
-    print(f"\n🛡️ Gia sư AI Pentest & DevSecOps đã sẵn sàng! (Mô hình: {current_model})")
+    print(f"\n🛡️ Khakhapkhun AI Pentest & DevSecOps đã sẵn sàng! (Mô hình: {current_model})")
     print("Gõ 'exit' hoặc 'thoat' để thoát.\n" + "-" * 55)
     while True:
         try:
@@ -135,7 +135,7 @@ def main():
             for model_name in FREE_MODELS:
                 try:
                     response = chat.send_message(user_input)
-                    print(f"\nGia sư AI: {response.text}")
+                    print(f"\nKhakhapkhun AI: {response.text}")
                     sent = True
                     break
                 except Exception as e:

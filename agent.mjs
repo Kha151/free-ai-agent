@@ -36,7 +36,7 @@ class AIAgent {
     this.systemInstruction = {
       parts: [
         {
-          text: `Bạn là Gia Sư Chuyên Gia về Kiểm Thử Thâm Nhập (Penetration Testing) và Tự Động Hóa Bảo Mật CI/CD (DevSecOps).
+          text: `Bạn là Khakhapkhun AI - Chuyên Gia về Kiểm Thử Thâm Nhập (Penetration Testing) và Tự Động Hóa Bảo Mật CI/CD (DevSecOps).
 MỤC TIÊU: Đào tạo người dùng trở thành chuyên gia về cả Tấn công đạo đức (Ethical Hacking / Pentest) và Phòng thủ tự động hóa (DevOps & DevSecOps).
 
 NGÔN NGỮ BẮT BUỘC:
@@ -294,7 +294,7 @@ async function runSelfTest() {
     console.log(`${C.green}✓ OK${C.reset} (${kaliCatRes.totalTools} tools found)`);
 
     // Clean up temporary test files
-    await (await import("fs/promises")).unlink(sampleDocPath).catch(() => {});
+    await (await import("fs/promises")).unlink(sampleDocPath).catch(() => { });
 
     // Clean up temporary test file
     await (await import("fs/promises")).unlink("test_agent.tmp").catch(() => { });
@@ -312,7 +312,7 @@ async function main() {
     return;
   }
   console.log(`\n${C.green}${C.bold}==============================================${C.reset}`);
-  console.log(`${C.green}${C.bold}   🛡️  Gia Sư AI: Pentest & DevSecOps (VN)   ${C.reset}`);
+  console.log(`${C.green}${C.bold}   🛡️  Khakhapkhun AI: Pentest & DevSecOps (VN)   ${C.reset}`);
   console.log(`${C.green}${C.bold}==============================================${C.reset}\n`);
 
   let apiKey = process.env.GEMINI_API_KEY;
@@ -325,7 +325,7 @@ async function main() {
     apiKey = await rl.question(`${C.bold}Nhập Gemini API key của bạn: ${C.reset}`);
     apiKey = apiKey.trim();
     if (!apiKey) {
-      console.log(`${C.red}Lỗi: Cần có API key để khởi động Gia Sư AI.${C.reset}`);
+      console.log(`${C.red}Lỗi: Cần có API key để khởi động Khakhapkhun AI.${C.reset}`);
       rl.close();
       return;
     }
@@ -340,12 +340,12 @@ async function main() {
     console.log(`${C.bold}Câu hỏi:${C.reset} ${singlePrompt}`);
     console.log(`${C.dim}Mô hình AI: ${agent.activeModel}...${C.reset}`);
     const response = await agent.processUserMessage(singlePrompt);
-    console.log(`\n${C.green}${C.bold}Gia sư AI:${C.reset} ${response}\n`);
+    console.log(`\n${C.green}${C.bold}Khakhapkhun AI:${C.reset} ${response}\n`);
     rl.close();
     return;
   }
 
-  console.log(`\n${C.green}✓ Gia sư AI đã sẵn sàng! (Mô hình: ${agent.activeModel})${C.reset}`);
+  console.log(`\n${C.green}✓ Khakhapkhun AI đã sẵn sàng! (Mô hình: ${agent.activeModel})${C.reset}`);
   console.log(`${C.dim}Công cụ: listCurriculumTracks, getCurriculumLesson, auditCodeSnippet, searchWeb, v.v.${C.reset}`);
   console.log(`${C.dim}Nhập 'exit' hoặc 'quit' để kết thúc buổi học.${C.reset}\n`);
 
@@ -362,7 +362,7 @@ async function main() {
     try {
       process.stdout.write(`${C.dim}Đang suy nghĩ và phân tích...${C.reset}\r`);
       const response = await agent.processUserMessage(trimmed);
-      console.log(`\r${" ".repeat(35)}\r${C.green}${C.bold}Gia sư AI:${C.reset} ${response}\n`);
+      console.log(`\r${" ".repeat(35)}\r${C.green}${C.bold}Khakhapkhun AI:${C.reset} ${response}\n`);
     } catch (err) {
       console.error(`\n${C.red}Lỗi: ${err.message}${C.reset}\n`);
     }
