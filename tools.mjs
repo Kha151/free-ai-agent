@@ -6,6 +6,12 @@ import {
   runSemgrepScan,
   runTrivyScan,
   runNmapScan,
+  runNiktoScan,
+  runSqlmapScan,
+  runDirbScan,
+  runGobusterScan,
+  runMetasploitScan,
+  runKaliCommand,
 } from "./securityTools.mjs";
 import {
   learnLatestThreats,
@@ -376,14 +382,82 @@ export const TOOL_DECLARATIONS = [
   },
   {
     name: "runNmapScan",
-    description: "Runs Nmap network and port scan on authorized lab targets (localhost, 127.0.0.1, scanme.nmap.org) and explains services and defensive mitigations.",
+    description: "Chạy Nmap quét cổng và dịch vụ mạng trong Kali Linux (Docker/WSL/Hyper-V). Nếu không có Kali, dùng engine mô phỏng.",
     parameters: {
       type: "OBJECT",
       properties: {
-        targetHost: { type: "STRING", description: "Authorized target host (e.g. 127.0.0.1 or scanme.nmap.org)" },
-        ports: { type: "STRING", description: "Comma-separated ports (e.g. '80,443,8080,22,3000')" },
-        flags: { type: "STRING", description: "Nmap scan flags (e.g. '-sV' for version detection)" }
+        targetHost: { type: "STRING", description: "Địa chỉ IP hoặc hostname (e.g. 127.0.0.1, scanme.nmap.org)" },
+        ports: { type: "STRING", description: "Danh sách cổng, cách nhau bởi dấu phẩy (e.g. '80,443,8080,22')" },
+        flags: { type: "STRING", description: "Cờ Nmap (e.g. '-sV' phát hiện phiên bản, '-sS' SYN scan)" }
       }
+    }
+  },
+  {
+    name: "runNiktoScan",
+    description: "Chạy Nikto quét web server để phát hiện lỗ hổng phổ biến (trong Kali Linux Docker/WSL/Hyper-V).",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        targetHost: { type: "STRING", description: "Hostname hoặc IP của web server" },
+        port: { type: "STRING", description: "Cổng web (mặc định 80)" }
+      },
+      required: ["targetHost"]
+    }
+  },
+  {
+    name: "runSqlmapScan",
+    description: "Chạy sqlmap kiểm tra SQL Injection trên URL mục tiêu (trong Kali Linux Docker/WSL/Hyper-V).",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        url: { type: "STRING", description: "URL đầy đủ cần kiểm tra (e.g. http://example.com/page?id=1)" }
+      },
+      required: ["url"]
+    }
+  },
+  {
+    name: "runDirbScan",
+    description: "Chạy Dirb brute-force thư mục web (trong Kali Linux Docker/WSL/Hyper-V).",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        targetUrl: { type: "STRING", description: "URL mục tiêu (e.g. http://example.com)" }
+      },
+      required: ["targetUrl"]
+    }
+  },
+  {
+    name: "runGobusterScan",
+    description: "Chạy Gobuster enumeration path/directory trên web (trong Kali Linux Docker/WSL/Hyper-V).",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        targetUrl: { type: "STRING", description: "URL mục tiêu (e.g. http://example.com)" },
+        wordlist: { type: "STRING", description: "Đường dẫn wordlist trong Kali (mặc định /usr/share/wordlists/dirb/common.txt)" }
+      },
+      required: ["targetUrl"]
+    }
+  },
+  {
+    name: "runMetasploitScan",
+    description: "Chạy Metasploit auxiliary module trong Kali Linux (Docker/WSL/Hyper-V).",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        module: { type: "STRING", description: "Metasploit module path (e.g. auxiliary/scanner/portscan/tcp)" },
+        options: { type: "STRING", description: "Các option cách nhau bởi dấu cách (e.g. 'RHOSTS=10.0.0.5 RPORT=8080')" }
+      }
+    }
+  },
+  {
+    name: "runKaliCommand",
+    description: "Chạy một lệnh bất kỳ trong môi trường Kali Linux (Docker/WSL/Hyper-V). Dùng khi cần chạy công cụ pentest chưa có wrapper riêng.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        command: { type: "STRING", description: "Lệnh Linux cần thực thi trong Kali (e.g. 'whatweb http://example.com')" }
+      },
+      required: ["command"]
     }
   }
 ];
@@ -403,5 +477,11 @@ export const TOOL_HANDLERS = {
   runSemgrepScan,
   runTrivyScan,
   runNmapScan,
+  runNiktoScan,
+  runSqlmapScan,
+  runDirbScan,
+  runGobusterScan,
+  runMetasploitScan,
+  runKaliCommand,
 };
 

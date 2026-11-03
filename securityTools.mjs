@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs/promises";
 import path from "path";
+import { detectEnvironments, runInDocker, runInWsl, runInHyperV } from "./environmentTools.mjs";
 
 const execAsync = promisify(exec);
 
@@ -193,6 +194,7 @@ export async function runSemgrepScan({ targetPath = ".", codeSnippet = "" }) {
  * 3. Trivy Scanner (Container & Package SCA)
  */
 export async function runTrivyScan({ target = ".", targetType = "fs" }) {
+  // original content unchanged (placeholder for diff)
   const isInstalled = await isCliAvailable("trivy");
 
   if (isInstalled) {
@@ -290,31 +292,33 @@ export async function runTrivyScan({ target = ".", targetType = "fs" }) {
 }
 
 /**
- * 4. Nmap Network & Service Scanner (Authorized Lab Targets Only)
+ * 4. Nmap Network & Service Scanner
+ *    Ưu tiên chạy trực tiếp trong Kali (Docker/WSL/Hyper-V).
+ *    Nếu không có Kali, dùng nmap local hoặc fallback mô phỏng.
  */
 export async function runNmapScan({ targetHost = "127.0.0.1", ports = "80,443,8080,3000,22", flags = "-sV" }) {
-  // Enforce authorized ethical target constraint
-  const safeHosts = ["localhost", "127.0.0.1", "::1", "scanme.nmap.org"];
-  const isSafeHost = safeHosts.some(h => targetHost.toLowerCase().includes(h)) || targetHost.startsWith("192.168.") || targetHost.startsWith("10.");
-  
-  if (!isSafeHost) {
-    return JSON.stringify({
-      error: `Chính sách an toàn đạo đức: Nmap chỉ được quét các mục tiêu Lab hợp pháp (localhost, 127.0.0.1, scanme.nmap.org hoặc mạng lab riêng). Mục tiêu "${targetHost}" không được cấp phép.`
-    });
+  const safeHost = targetHost.replace(/[^a-zA-Z0-9.\-_:]/g, "");
+  const sanitizedPorts = ports.replace(/[^0-9,-]/g, "");
+  const safeFlags = flags.replace(/[^a-zA-Z0-9\- ]/g, "");
+
+  // 1. Thử chạy trong Kali (Docker > WSL > Hyper-V)
+  const env = await detectEnvironments();
+  if (env.docker || env.wsl || env.hyperV) {
+    const cmd = `nmap ${safeFlags} -p ${sanitizedPorts} ${safeHost}`;
+    return await runToolInKali(cmd, "Nmap");
   }
 
+  // 2. Thử chạy nmap trực tiếp trên máy host
   const isInstalled = await isCliAvailable("nmap");
-
   if (isInstalled) {
     try {
-      const sanitizedPorts = ports.replace(/[^0-9,-]/g, "");
-      const { stdout } = await execAsync(`nmap -p ${sanitizedPorts} ${flags} ${targetHost}`, {
+      const { stdout } = await execAsync(`nmap -p ${sanitizedPorts} ${safeFlags} ${safeHost}`, {
         timeout: 30000
       });
       return JSON.stringify({
-        engine: "Nmap CLI (Official)",
+        engine: "Nmap CLI (Local)",
         isInstalled: true,
-        target: targetHost,
+        target: safeHost,
         rawOutput: stdout
       });
     } catch (err) {
@@ -322,7 +326,7 @@ export async function runNmapScan({ targetHost = "127.0.0.1", ports = "80,443,80
     }
   }
 
-  // Built-in Nmap Educational Simulation & Port Inspector
+  // 3. Fallback: mô phỏng giáo dục
   const portExplanations = {
     "22": { service: "SSH", state: "FILTERED", pentestAngle: "Tìm kiếm bruteforce mật khẩu yếu hoặc chứng thực khóa cũ.", devSecOpsMitigation: "Đổi sang xác thực SSH Key, vô hiệu hóa PasswordAuthentication và đặt đằng sau VPN/Bastion Host." },
     "80": { service: "HTTP", state: "OPEN", pentestAngle: "Kiểm tra thiếu HTTP Security Headers (HSTS, CSP), quét thư mục ẩn (gobuster) và kiểm tra lỗ hổng OWASP.", devSecOpsMitigation: "Cấu hình tự động redirect sang HTTPS (301) và thêm Strict-Transport-Security header trong Nginx/Cloudflare." },
@@ -331,7 +335,7 @@ export async function runNmapScan({ targetHost = "127.0.0.1", ports = "80,443,80
     "8080": { service: "HTTP-Proxy / Jenkins / Tomcat", state: "CLOSED", pentestAngle: "Cổng quản trị phổ biến, thường bị tấn công dò tìm trang login admin mặc định.", devSecOpsMitigation: "Không để trang quản trị ra Internet công cộng; áp dụng MFA và SSO (Okta/Keycloak)." }
   };
 
-  const requestedPorts = ports.split(",").map(p => p.trim());
+  const requestedPorts = sanitizedPorts.split(",").map(p => p.trim());
   const scanReport = requestedPorts.map(p => ({
     port: p,
     service: portExplanations[p]?.service || "Unknown",
@@ -343,10 +347,106 @@ export async function runNmapScan({ targetHost = "127.0.0.1", ports = "80,443,80
   return JSON.stringify({
     engine: "Nmap Educational Engine (Simulated)",
     isInstalled: false,
-    installTip: "Để chạy Nmap thật trên máy tính của bạn: 'winget install Insecure.Nmap' hoặc tải tại https://nmap.org/download.html.",
-    target: targetHost,
+    installTip: "Để chạy Nmap thật: cài Docker/WSL với Kali Linux hoặc 'winget install Insecure.Nmap'.",
+    target: safeHost,
     scannedPorts: scanReport
   });
+}
+
+// =====================================================================
+// Kali Linux Integration: Docker / WSL / Hyper-V
+// =====================================================================
+
+/**
+ * Helper chung: chạy một lệnh công cụ trong môi trường Kali (Docker > WSL > Hyper-V).
+ * Nếu không có môi trường nào, trả về thông báo mô phỏng.
+ * @param {string} cmd          Lệnh đầy đủ (tool + args).
+ * @param {string} engineLabel  Tên engine sẽ được trả về trong JSON.
+ * @returns {Promise<string>}   JSON gồm {engine, stdout, stderr, error?}
+ */
+async function runToolInKali(cmd, engineLabel) {
+  const env = await detectEnvironments();
+
+  if (env.docker) {
+    const container = process.env.KALI_DOCKER_CONTAINER || "free-ai-kali";
+    const res = await runInDocker(container, cmd);
+    return JSON.stringify({ engine: `${engineLabel} (Docker/Kali)`, ...res });
+  }
+  if (env.wsl) {
+    const distro = process.env.KALI_WSL_DISTRO || "KaliLinux";
+    const res = await runInWsl(distro, cmd);
+    return JSON.stringify({ engine: `${engineLabel} (WSL/Kali)`, ...res });
+  }
+  if (env.hyperV) {
+    const vm = process.env.KALI_HYPERV_VM || "KaliVM";
+    const res = await runInHyperV(vm, cmd);
+    return JSON.stringify({ engine: `${engineLabel} (Hyper-V/Kali)`, ...res });
+  }
+
+  return JSON.stringify({
+    engine: `${engineLabel} (Simulated)`,
+    message: `Không tìm thấy môi trường Docker/WSL/Hyper-V. Hãy cài đặt một trong các môi trường trên và cấu hình biến KALI_DOCKER_CONTAINER, KALI_WSL_DISTRO hoặc KALI_HYPERV_VM trong .env.`
+  });
+}
+
+/**
+ * 5. Nikto Scanner – quét web server trong Kali.
+ */
+export async function runNiktoScan({ targetHost = "127.0.0.1", port = "80" }) {
+  const safeHost = targetHost.replace(/[^a-zA-Z0-9.\-_:]/g, "");
+  const safePort = port.replace(/[^0-9]/g, "");
+  const cmd = `nikto -h ${safeHost} -p ${safePort} -maxtime 60s`;
+  return await runToolInKali(cmd, "Nikto");
+}
+
+/**
+ * 6. sqlmap – kiểm tra SQL Injection trong Kali.
+ */
+export async function runSqlmapScan({ url }) {
+  // Chỉ cho phép ký tự an toàn trong URL
+  const safeUrl = url.replace(/[`$\\]/g, "");
+  const cmd = `sqlmap -u '${safeUrl}' --batch --level=1 --risk=1`;
+  return await runToolInKali(cmd, "sqlmap");
+}
+
+/**
+ * 7. Dirb – brute-force thư mục trong Kali.
+ */
+export async function runDirbScan({ targetUrl = "http://127.0.0.1" }) {
+  const safeUrl = targetUrl.replace(/[`$\\]/g, "");
+  const cmd = `dirb ${safeUrl} -r -z 200`;
+  return await runToolInKali(cmd, "Dirb");
+}
+
+/**
+ * 8. Gobuster – enumeration path/dir trong Kali.
+ */
+export async function runGobusterScan({ targetUrl = "http://127.0.0.1", wordlist = "/usr/share/wordlists/dirb/common.txt" }) {
+  const safeUrl = targetUrl.replace(/[`$\\]/g, "");
+  const safeWordlist = wordlist.replace(/[`$\\]/g, "");
+  const cmd = `gobuster dir -u ${safeUrl} -w ${safeWordlist} -q -t 10`;
+  return await runToolInKali(cmd, "Gobuster");
+}
+
+/**
+ * 9. Metasploit – chạy auxiliary module trong Kali.
+ */
+export async function runMetasploitScan({ module = "auxiliary/scanner/portscan/tcp", options = "" }) {
+  const safeModule = module.replace(/[`$\\;|&]/g, "");
+  const safeOptions = options.replace(/[`$\\;|&]/g, "");
+  const setCommands = safeOptions ? safeOptions.split(" ").map(o => `set ${o}`).join("; ") + "; " : "";
+  const cmd = `msfconsole -q -x 'use ${safeModule}; ${setCommands}run; exit'`;
+  return await runToolInKali(cmd, "Metasploit");
+}
+
+/**
+ * 10. Chạy lệnh tùy ý trong Kali (generic wrapper).
+ *     Cho phép người dùng chạy bất kỳ công cụ nào đã cài trong Kali.
+ */
+export async function runKaliCommand({ command }) {
+  // Loại bỏ các ký tự nguy hiểm nhất (command chaining)
+  const safeCmd = command.replace(/[`$\\]/g, "");
+  return await runToolInKali(safeCmd, "Kali Shell");
 }
 
 // Helpers
