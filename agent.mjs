@@ -13,14 +13,17 @@ const C = {
   dim: "\x1b[2m",
 };
 
-// Danh sách các model miễn phí trên Google AI Studio (ưu tiên các model nhanh, nhẹ và hạn mức cao nhất)
+// Danh sách các model miễn phí đang hoạt động tốt nhất trên Google AI Studio
 const DEFAULT_MODELS = [
-  "gemini-2.5-flash",
-  "gemini-2.5-flash-lite",
-  "gemini-2.0-flash",
-  "gemini-2.0-flash-lite",
-  "gemini-1.5-flash",
-  "gemini-1.5-flash-8b",
+  "gemini-3.1-flash-lite",
+  "gemini-flash-lite-latest",
+  "gemini-3.5-flash-lite",
+  "gemini-3.5-flash",
+  "gemini-3.6-flash",
+  "gemini-3-flash-preview",
+  "gemini-3.1-flash-lite-preview",
+  "gemini-3.8-flash",
+  "gemini-flash-latest",
 ];
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
@@ -167,8 +170,7 @@ Các trụ cột kiến thức chính:
         }
 
         console.log(
-          `  ${C.dim}↳ Output: ${toolOutput.slice(0, 120)}${
-            toolOutput.length > 120 ? "..." : ""
+          `  ${C.dim}↳ Output: ${toolOutput.slice(0, 120)}${toolOutput.length > 120 ? "..." : ""
           }${C.reset}`
         );
 
@@ -272,7 +274,7 @@ async function runSelfTest() {
     console.log(`${C.green}✓ OK${C.reset} (${nmapRes.engine})`);
 
     // Clean up temporary test file
-    await (await import("fs/promises")).unlink("test_agent.tmp").catch(() => {});
+    await (await import("fs/promises")).unlink("test_agent.tmp").catch(() => { });
 
     console.log(`\n${C.green}${C.bold}🎉 All Agent tools are healthy and operational!${C.reset}\n`);
   } catch (err) {
