@@ -203,10 +203,72 @@
     .model-selector {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
       font-size: 14px;
       font-weight: 600;
       color: var(--text-secondary);
+    }
+
+    .mode-select-dropdown {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .mode-select-dropdown:hover,
+    .mode-select-dropdown:focus {
+      border-color: #60a5fa;
+      background: #2f3133;
+    }
+
+    .sidebar-section-title {
+      padding: 10px 16px 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .mode-pill-list {
+      padding: 0 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .mode-pill {
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .mode-pill:hover {
+      background: #36383a;
+      color: var(--text-primary);
+    }
+
+    .mode-pill.active {
+      background: rgba(66, 133, 244, 0.15);
+      border-color: rgba(66, 133, 244, 0.4);
+      color: #93c5fd;
+      font-weight: 600;
     }
 
     .model-badge {
@@ -563,26 +625,29 @@
       Đoạn chat mới
     </button>
 
-    <div class="quick-actions">
-      <button class="quick-btn" onclick="sendPrompt('Hãy liệt kê danh sách các track học tập Pentest & DevSecOps')">
-        📚 Lộ trình học tập
+    <div class="sidebar-section-title">Chế độ hoạt động</div>
+    <div class="mode-pill-list" id="sidebarModePills">
+      <button class="mode-pill active" id="pill-pentest" onclick="switchMode('pentest')">
+        <span>🛡️ 1. Pentest & DevSecOps</span>
       </button>
-      <button class="quick-btn" onclick="sendPrompt('Liệt kê danh mục công cụ trong Kali Linux kèm lệnh thực thi')">
-        🐉 Công cụ Kali Linux
+      <button class="mode-pill" id="pill-trading" onclick="switchMode('trading')">
+        <span>📈 2. Trading Gold & Coin</span>
       </button>
-      <button class="quick-btn" onclick="sendPrompt('Cập nhật các mối đe dọa bảo mật mới nhất từ Internet')">
-        🌐 Cập nhật CVE mới
+      <button class="mode-pill" id="pill-dev" onclick="switchMode('dev')">
+        <span>💻 3. Learning Dev</span>
       </button>
-      <button class="quick-btn" onclick="document.getElementById('fileUploadInput').click()">
-        📄 Tải lên PDF/Docx học
-      </button>
+    </div>
+
+    <div class="sidebar-section-title">Hành động gợi ý</div>
+    <div class="quick-actions" id="quickActionsContainer">
+      <!-- Injected by renderModeUI() -->
     </div>
 
     <div
       style="padding: 10px 16px 4px; font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">
       Lịch sử hội thoại</div>
     <div class="chat-history-list" id="chatHistoryList">
-      <div class="history-item active">Phiên học hiện tại</div>
+      <div class="history-item active" id="historyItemText">Phiên làm việc hiện tại</div>
     </div>
 
     <div class="sidebar-footer">
@@ -598,11 +663,15 @@
   <main class="main-container">
     <header class="top-header">
       <div class="model-selector">
-        <span>Khakhapkhun AI: Pentest & DevSecOps</span>
+        <select id="modeDropdown" class="mode-select-dropdown" onchange="switchMode(this.value)">
+          <option value="pentest">🛡️ Mode 1: Gia sư Pentest & DevSecOps</option>
+          <option value="trading">📈 Mode 2: Trading Gold and Coin (Blockchain)</option>
+          <option value="dev">💻 Mode 3: Learning Dev (Lập trình & Kiến trúc)</option>
+        </select>
         <span class="model-badge" id="activeModelBadge">gemini-3.1-flash-lite</span>
       </div>
       <div style="display: flex; gap: 10px;">
-        <button class="action-btn" title="Xóa màn hình" onclick="startNewChat()">🗑️</button>
+        <button class="action-btn" title="Xóa màn hình / Tạo phiên mới" onclick="startNewChat()">🗑️</button>
       </div>
     </header>
 
@@ -674,6 +743,70 @@
   <script>
     let currentUploadedFilePath = null;
     let isProcessing = false;
+    let currentMode = 'pentest';
+
+    const MODES_CONFIG = {
+      pentest: {
+        id: "pentest",
+        name: "Gia sư Pentest & DevSecOps",
+        badge: "Mode 1: Pentest & DevSecOps",
+        icon: "🛡️",
+        heroSubtitle: "Khakhapkhun AI chuyên về <strong>Kiểm thử thâm nhập (Offensive Pentest)</strong> và <strong>Tự động hóa an toàn DevSecOps (Shift-Left)</strong>. Hỗ trợ chạy tool trong Kali Linux và đọc tài liệu PDF/Word.",
+        inputPlaceholder: "Hỏi về Pentest, DevSecOps, lệnh Kali, hoặc upload tài liệu...",
+        quickActions: [
+          { text: "📚 Lộ trình học tập", prompt: "Hãy liệt kê danh sách các track học tập Pentest & DevSecOps" },
+          { text: "🐉 Công cụ Kali Linux", prompt: "Liệt kê danh mục công cụ trong Kali Linux kèm lệnh thực thi" },
+          { text: "🌐 Cập nhật CVE mới", prompt: "Cập nhật các mối đe dọa bảo mật mới nhất từ Internet" },
+          { text: "📄 Tải lên PDF/Docx học", isUpload: true }
+        ],
+        suggestions: [
+          { title: "💉 Phân tích SQL Injection", desc: "Góc nhìn Pentester khai thác và DevSecOps vá code", prompt: "Hướng dẫn tôi cách khai thác và khắc phục lỗ hổng SQL Injection" },
+          { title: "🐉 Công cụ Kali Web", desc: "Nikto, WhatWeb, Dirb, Wfuzz kèm lệnh thực thi", prompt: "Liệt kê toàn bộ các công cụ Pentest Web trong Kali Linux" },
+          { title: "🔍 Audit bảo mật mã nguồn", desc: "Phát hiện CWE-78 và đề xuất quy tắc SAST Semgrep", prompt: "Kiểm tra đoạn mã sau xem có lỗi Command Injection không:\n\nconst cmd = `ping ${req.query.ip}`; exec(cmd);" },
+          { title: "🚀 Triển khai DevSecOps", desc: "Gitleaks, Semgrep, Trivy trong GitHub Actions", prompt: "Giải thích quy trình Shift-Left và các công cụ quét tự động trong CI/CD" }
+        ]
+      },
+      trading: {
+        id: "trading",
+        name: "Trading Gold and Coin (Blockchain)",
+        badge: "Mode 2: Trading Gold & Coin",
+        icon: "📈",
+        heroSubtitle: "Chuyên gia phân tích kỹ thuật <strong>Hành động giá (Price Action)</strong>, <strong>SMC</strong>, vĩ mô Vàng thế giới (<strong>XAU/USD</strong>) và thị trường <strong>Crypto & Blockchain</strong>. Quản trị rủi ro kỷ luật 1-2%.",
+        inputPlaceholder: "Hỏi về phân tích Vàng XAU/USD, Bitcoin, On-chain, tính quản lý vốn...",
+        quickActions: [
+          { text: "🥇 Phân tích Vàng (XAU/USD)", prompt: "Phân tích xu hướng Vàng XAU/USD hiện tại kết hợp chỉ số DXY và lãi suất Fed" },
+          { text: "₿ Xu hướng Bitcoin & Altcoin", prompt: "Phân tích xu hướng Bitcoin, BTC Dominance (BTC.D) và chu kỳ Halving 4 năm" },
+          { text: "⚖️ Quản lý vốn 1-2% tài khoản", prompt: "Hướng dẫn tôi cách tính khối lượng vào lệnh (Position Size) với tài khoản 5000 USD, rủi ro 1%" },
+          { text: "⛓️ Kiến trúc Blockchain & Gas", prompt: "Giải thích cơ chế đồng thuận PoW vs PoS, phí gas Ethereum và các giải pháp Layer 2" }
+        ],
+        suggestions: [
+          { title: "🥇 Chiến lược Vàng (XAU/USD)", desc: "Phân tích SMC, Order Block & tin tức Non-Farm/CPI", prompt: "Hướng dẫn phương pháp giao dịch Vàng XAU/USD theo Smart Money Concepts (SMC) và quản trị rủi ro" },
+          { title: "₿ Chu kỳ Bitcoin & Halving", desc: "Tương quan BTC, ETH, On-chain & mùa Altcoin", prompt: "Giải thích các giai đoạn của một chu kỳ thị trường Crypto và cách nhận biết đỉnh/đáy theo On-chain" },
+          { title: "⚖️ Tính toán Khối lượng vào lệnh", desc: "Kiểm soát rủi ro không quá 1-2% tài khoản", prompt: "Tính toán Position Sizing cho tôi: Tài khoản 2000 USD, rủi ro 1.5%, Entry Vàng 2720, Stop-Loss 2708" },
+          { title: "⛓️ Web3 & Smart Contracts", desc: "DeFi, AMM DEX, Phí Gas & Bảo mật ví lạnh/nóng", prompt: "Phân tích kiến trúc của Ethereum Virtual Machine (EVM), cơ chế tính gas và cách bảo vệ tài sản Web3" }
+        ]
+      },
+      dev: {
+        id: "dev",
+        name: "Learning Dev (Lập trình & Kiến trúc)",
+        badge: "Mode 3: Learning Dev",
+        icon: "💻",
+        heroSubtitle: "Cố vấn đào tạo <strong>Fullstack Developer & Kiến trúc phần mềm</strong>: Cấu trúc dữ liệu & Thuật toán (DSA), <strong>Clean Code</strong>, <strong>SOLID</strong>, Design Patterns, REST API, Database và DevOps.",
+        inputPlaceholder: "Hỏi về thuật toán, kiến trúc hệ thống, fix bug, review code hoặc upload tài liệu...",
+        quickActions: [
+          { text: "🗺️ Lộ trình Fullstack 2026", prompt: "Vẽ lộ trình chi tiết từ số 0 để trở thành Senior Fullstack Developer năm 2026" },
+          { text: "🧩 Thuật toán & Big-O", prompt: "Giải thích độ phức tạp thuật toán Big-O và mẹo tối ưu từ O(N^2) xuống O(N log N)" },
+          { text: "🏛️ Design Patterns & SOLID", prompt: "Giải thích 5 nguyên lý SOLID kèm ví dụ code thực tế minh họa từng nguyên lý" },
+          { text: "🏗️ Tạo khung Clean Architecture", prompt: "Tạo cấu trúc thư mục Clean Architecture chuẩn công nghiệp cho dự án Node.js/Express TypeScript" }
+        ],
+        suggestions: [
+          { title: "🗺️ Lộ trình Fullstack Web", desc: "Frontend, Backend, Database, CI/CD và Cloud", prompt: "Xây dựng lộ trình học tập để thành thạo TypeScript, Next.js, Node.js và PostgreSQL" },
+          { title: "🧩 Tối ưu độ phức tạp Big-O", desc: "So sánh Time & Space Complexity của các thuật toán", prompt: "Giải thích thuật toán Binary Search và Two Pointers, kèm ví dụ code và phân tích Big-O" },
+          { title: "🏛️ Áp dụng SOLID & Design Patterns", desc: "Factory, Strategy, Observer, Repository Pattern", prompt: "Hướng dẫn áp dụng Repository Pattern và Dependency Inversion Principle (DIP) vào dự án Backend" },
+          { title: "🛠️ Review & Refactor Code", desc: "Phát hiện Code Smell, tối ưu hiệu năng và Clean Code", prompt: "Hãy review và refactor đoạn code này giúp tôi theo nguyên tắc Clean Code:\n\nfunction processData(arr) { let res = []; for(let i=0; i<arr.length; i++) { if(arr[i].status == 'active' && arr[i].age > 18) res.push(arr[i].name); } return res; }" }
+        ]
+      }
+    };
 
     function autoResize(el) {
       el.style.height = 'auto';
@@ -693,34 +826,107 @@
       sendMessage();
     }
 
-    function startNewChat() {
-      fetch('/api/reset', { method: 'POST' });
-      document.getElementById('messagesContainer').innerHTML = `
-        <div class="hero-container" id="heroScreen">
-          <h1 class="hero-title">Tôi có thể giúp gì cho bạn hôm nay?</h1>
-          <p class="hero-subtitle">
-            Khakhapkhun AI chuyên về <strong>Kiểm thử thâm nhập (Offensive Pentest)</strong> và <strong>Tự động hóa an toàn DevSecOps (Shift-Left)</strong>. Hỗ trợ chạy tool trong Kali Linux và đọc tài liệu PDF/Word.
-          </p>
+    function renderModeUI(modeKey) {
+      currentMode = modeKey || 'pentest';
+      const config = MODES_CONFIG[currentMode] || MODES_CONFIG.pentest;
+
+      // Sync dropdown
+      const dropdown = document.getElementById('modeDropdown');
+      if (dropdown) dropdown.value = currentMode;
+
+      // Sync sidebar pills
+      ['pentest', 'trading', 'dev'].forEach(m => {
+        const pill = document.getElementById(`pill-${m}`);
+        if (pill) {
+          if (m === currentMode) pill.classList.add('active');
+          else pill.classList.remove('active');
+        }
+      });
+
+      // Update sidebar history title
+      const histText = document.getElementById('historyItemText');
+      if (histText) histText.textContent = `${config.icon} ${config.badge}`;
+
+      // Update placeholder
+      const chatInput = document.getElementById('chatInput');
+      if (chatInput) chatInput.placeholder = config.inputPlaceholder;
+
+      // Render quick actions
+      const qaContainer = document.getElementById('quickActionsContainer');
+      if (qaContainer) {
+        qaContainer.innerHTML = '';
+        config.quickActions.forEach(qa => {
+          const btn = document.createElement('button');
+          btn.className = 'quick-btn';
+          btn.textContent = qa.text;
+          if (qa.isUpload) {
+            btn.onclick = () => document.getElementById('fileUploadInput').click();
+          } else {
+            btn.onclick = () => sendPrompt(qa.prompt);
+          }
+          qaContainer.appendChild(btn);
+        });
+      }
+
+      renderHeroScreen();
+    }
+
+    function renderHeroScreen() {
+      const config = MODES_CONFIG[currentMode] || MODES_CONFIG.pentest;
+      const container = document.getElementById('messagesContainer');
+      
+      let heroEl = document.getElementById('heroScreen');
+      if (!heroEl && container.children.length === 0) {
+        heroEl = document.createElement('div');
+        heroEl.id = 'heroScreen';
+        heroEl.className = 'hero-container';
+        container.appendChild(heroEl);
+      }
+
+      if (heroEl) {
+        heroEl.innerHTML = `
+          <h1 class="hero-title">${config.icon} ${config.name}</h1>
+          <p class="hero-subtitle">${config.heroSubtitle}</p>
           <div class="suggestion-grid">
-            <div class="suggestion-card" onclick="sendPrompt('Hướng dẫn tôi cách khai thác và khắc phục lỗ hổng SQL Injection')">
-              <div class="suggestion-title">💉 Phân tích SQL Injection</div>
-              <div class="suggestion-desc">Góc nhìn Pentester khai thác và DevSecOps vá code</div>
-            </div>
-            <div class="suggestion-card" onclick="sendPrompt('Liệt kê toàn bộ các công cụ Pentest Web trong Kali Linux')">
-              <div class="suggestion-title">🐉 Công cụ Kali Web</div>
-              <div class="suggestion-desc">Nikto, WhatWeb, Dirb, Wfuzz kèm lệnh thực thi</div>
-            </div>
-            <div class="suggestion-card" onclick="sendPrompt('Kiểm tra đoạn mã sau xem có lỗi Command Injection không:\n\nconst cmd = \`ping \${req.query.ip}\`; exec(cmd);')">
-              <div class="suggestion-title">🔍 Audit bảo mật mã nguồn</div>
-              <div class="suggestion-desc">Phát hiện CWE-78 và đề xuất quy tắc SAST Semgrep</div>
-            </div>
-            <div class="suggestion-card" onclick="sendPrompt('Giải thích quy trình Shift-Left và các công cụ quét tự động trong CI/CD')">
-              <div class="suggestion-title">🚀 Triển khai DevSecOps</div>
-              <div class="suggestion-desc">Gitleaks, Semgrep, Trivy trong GitHub Actions</div>
-            </div>
+            ${config.suggestions.map(s => `
+              <div class="suggestion-card" onclick="sendPrompt(${JSON.stringify(s.prompt)})">
+                <div class="suggestion-title">${s.title}</div>
+                <div class="suggestion-desc">${s.desc}</div>
+              </div>
+            `).join('')}
           </div>
-        </div>
-      `;
+        `;
+      }
+    }
+
+    async function switchMode(modeKey) {
+      if (!MODES_CONFIG[modeKey]) return;
+      currentMode = modeKey;
+      try {
+        await fetch('/api/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode: currentMode })
+        });
+      } catch (e) {
+        console.error(e);
+      }
+
+      const container = document.getElementById('messagesContainer');
+      container.innerHTML = '';
+      renderModeUI(currentMode);
+      clearUploadedFile();
+    }
+
+    function startNewChat() {
+      fetch('/api/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: currentMode })
+      });
+      const container = document.getElementById('messagesContainer');
+      container.innerHTML = '';
+      renderModeUI(currentMode);
       clearUploadedFile();
     }
 
@@ -765,9 +971,10 @@
       const msgWrapper = document.createElement('div');
       msgWrapper.className = 'message-wrapper';
 
+      const config = MODES_CONFIG[currentMode] || MODES_CONFIG.pentest;
       const avatar = document.createElement('div');
       avatar.className = `avatar ${role}`;
-      avatar.textContent = role === 'user' ? '👤' : '🛡️';
+      avatar.textContent = role === 'user' ? '👤' : config.icon;
 
       const msgBody = document.createElement('div');
       msgBody.className = 'message-content';
@@ -805,8 +1012,9 @@
       const typingEl = document.createElement('div');
       typingEl.id = 'typingIndicator';
       typingEl.className = 'message-wrapper';
+      const config = MODES_CONFIG[currentMode] || MODES_CONFIG.pentest;
       typingEl.innerHTML = `
-        <div class="avatar ai">🛡️</div>
+        <div class="avatar ai">${config.icon}</div>
         <div class="message-content">
           <div class="typing-indicator">
             <div class="typing-dot"></div>
@@ -832,7 +1040,7 @@
 
       let messagePayload = text;
       if (currentUploadedFilePath) {
-        messagePayload = `[Người dùng đã tải lên tài liệu: ${currentUploadedFilePath}]\n\n${text || 'Hãy tóm tắt và phân tích các kiến thức bảo mật chính trong tài liệu này.'}`;
+        messagePayload = `[Người dùng đã tải lên tài liệu: ${currentUploadedFilePath}]\n\n${text || 'Hãy tóm tắt và phân tích các kiến thức chính trong tài liệu này theo chế độ hiện tại.'}`;
       }
 
       appendMessage('user', text || `Đã tải lên tài liệu: ${currentUploadedFilePath}`);
@@ -848,7 +1056,10 @@
         const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: messagePayload })
+          body: JSON.stringify({
+            message: messagePayload,
+            mode: currentMode
+          })
         });
         const data = await res.json();
         removeTypingIndicator();
@@ -866,6 +1077,11 @@
         document.getElementById('sendBtn').disabled = false;
       }
     }
+
+    // Khởi động UI theo Mode 1 mặc định
+    document.addEventListener('DOMContentLoaded', () => {
+      renderModeUI('pentest');
+    });
   </script>
 </body>
 

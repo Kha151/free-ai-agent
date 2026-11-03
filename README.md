@@ -1,13 +1,31 @@
-# 🛡️ Khakhapkhun AI: Pentest & DevSecOps (Tiếng Việt)
+# 🛡️ Khakhapkhun AI - Đa Chế Độ (Multi-Mode AI Agent)
 
-Trợ lý & Khakhapkhun AI hoàn toàn miễn phí, hỗ trợ đào tạo chuyên sâu về **Kiểm thử thâm nhập (Penetration Testing / Ethical Hacking)** và **Tự động hóa bảo mật CI/CD (DevSecOps)** bằng **Tiếng Việt**.
+Trợ lý & Hệ thống AI đa năng hoàn toàn miễn phí, hỗ trợ 3 chế độ hoạt động chuyên sâu bằng **Tiếng Việt**:
 
-- **Phương pháp đào tạo 2 chiều (Dual-Perspective)**:
-  - *Góc nhìn Tấn công (Pentest)*: Hiểu cách hacker thu thập thông tin (Recon), khai thác lỗ hổng Web (OWASP Top 10) và leo thang đặc quyền (PrivEsc).
-  - *Góc nhìn Phòng thủ (DevSecOps)*: Áp dụng triết lý "Shift-Left", cấu hình các cổng kiểm soát bảo mật tự động (Secret Scanning, SAST, SCA, DAST, Container Hardening) trong pipeline GitHub Actions / GitLab CI.
-- **Giáo trình tích hợp sẵn (`curriculum.mjs`)**: Lộ trình bài bản kèm hướng dẫn thực hành trên các phòng lab hợp pháp (PortSwigger Web Security Academy, OWASP Juice Shop, DVWA, TryHackMe).
-- **Bộ công cụ bảo mật tích hợp**: Tự động rà soát mã nguồn & Dockerfile, tra cứu CVE, tính toán và ghi chép bài học vào workspace.
-- **Hoàn toàn miễn phí**: Sử dụng Google Gemini API Free Tier (1,500 requests/ngày).
+- **🛡️ Mode 1: Gia sư Pentest & DevSecOps**:
+  - *Tấn công (Pentest)*: Thu thập thông tin (Recon), Lỗ hổng Web (OWASP Top 10), Leo thang đặc quyền (PrivEsc) và tích hợp các công cụ Kali Linux (Nmap, Nikto, Sqlmap, Gobuster, Metasploit, Hydra).
+  - *Phòng thủ (DevSecOps)*: Triết lý Shift-Left, quét lộ lọt Secret (Gitleaks), quét mã tĩnh SAST (Semgrep), quét phụ thuộc SCA (Trivy), rà soát Dockerfile và pipeline CI/CD.
+- **📈 Mode 2: Trading Gold and Coin (Block-chain)**:
+  - *Vàng thế giới (XAU/USD)*: Phân tích kỹ thuật Price Action, Smart Money Concepts (SMC: Order Block, FVG, Liquidity), vĩ mô DXY, lãi suất Fed (FOMC), lạm phát CPI/NFP.
+  - *Crypto & Blockchain*: Chu kỳ Bitcoin Halving 4 năm, On-chain data, Whale tracking, Tokenomics, cơ chế đồng thuận PoW/PoS, EVM, Layer 2, DeFi, AMM DEX, bảo mật ví lạnh/ví nóng.
+  - *Kỷ luật Quản lý vốn*: Tính toán khối lượng vào lệnh (Position Sizing) kiểm soát rủi ro nghiêm ngặt 1-2% tài khoản, phân tích tỷ lệ Risk:Reward (R:R), các mốc Fibonacci Retracement & Extension.
+- **💻 Mode 3: Learning Dev (Lập trình & Kiến trúc phần mềm)**:
+  - *Cấu trúc dữ liệu & Thuật toán (DSA)*: Array, Linked List, Tree, Graph, Hash Map, Dynamic Programming, Two Pointers, phân tích độ phức tạp Big-O.
+  - *Kỹ nghệ phần mềm*: Clean Code, 5 nguyên lý SOLID, Design Patterns (Creational, Structural, Behavioral), tạo khung cấu trúc Clean Architecture & MVC.
+  - *Fullstack Web*: TypeScript, Next.js, Node.js/Express, Python/FastAPI, Go, Database SQL (PostgreSQL index/query optimization) & NoSQL (MongoDB, Redis), Docker & CI/CD.
+
+- **Đọc hiểu tài liệu đa định dạng (Document Learning)**: Tải lên và nạp kiến thức từ file PDF, DOCX, TXT, MD vào bộ nhớ tri thức.
+- **Hoàn toàn miễn phí**: Sử dụng Google Gemini API Free Tier (tự động chuyển đổi giữa các free models khi gặp giới hạn hạn mức).
+
+---
+
+## 🎯 3 Chế Độ Hoạt Động (Modes)
+
+| Chế độ (Mode) | Trọng tâm chuyên môn | Công cụ chuyên biệt tích hợp |
+| :--- | :--- | :--- |
+| **Mode 1: Pentest & DevSecOps** | Kiểm thử bảo mật, OWASP Top 10, DevSecOps Shift-Left, rà soát lỗ hổng. | `runNmapScan`, `runNiktoScan`, `runSqlmapScan`, `runGitleaksScan`, `runSemgrepScan`, `runTrivyScan`, `listKaliTools`. |
+| **Mode 2: Trading Gold & Coin** | Phân tích kỹ thuật Vàng XAU/USD, Crypto, Blockchain, On-chain, Quản lý vốn. | `calculatePositionSize`, `analyzeRiskReward`, `calculateFibonacciLevels`, `getCryptoMarketOverview`. |
+| **Mode 3: Learning Dev** | Fullstack Development, Giải thuật DSA, Clean Code, SOLID, Design Patterns. | `explainAlgorithmComplexity`, `generateProjectStructure`, `auditCodeSnippet`. |
 
 ---
 
@@ -44,7 +62,14 @@ npm start
 **Chế độ Terminal CLI:**
 ```powershell
 npm run cli
-# Hoặc: node --env-file=.env agent.mjs
+# Mặc định: Mode 1 (Pentest & DevSecOps)
+node --env-file=.env agent.mjs
+
+# Chạy Mode 2: Trading Gold & Coin
+node --env-file=.env agent.mjs --mode=trading
+
+# Chạy Mode 3: Learning Dev
+node --env-file=.env agent.mjs --mode=dev
 ```
 
 **Đặt câu hỏi nhanh qua dòng lệnh (CLI):**

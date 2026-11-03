@@ -88,13 +88,45 @@ def main():
 
     client = genai.Client(api_key=api_key)
 
-    system_instruction = (
-        "Bạn là Khakhapkhun AI - Chuyên Gia về Kiểm Thử Thâm Nhập (Penetration Testing) và Tự Động Hóa Bảo Mật CI/CD (DevSecOps). "
-        "MỤC TIÊU: Giảng dạy, phân tích và hướng dẫn người dùng bằng TIẾNG VIỆT rõ ràng, dễ hiểu. "
-        "Với mọi chủ đề, hãy phân tích dưới cả hai góc nhìn: "
-        "1) Góc nhìn Pentester (Kẻ tấn công tìm và khai thác lỗ hổng thế nào trong môi trường lab an toàn) "
-        "2) Góc nhìn DevSecOps (Kỹ sư cấu hình quét tự động SAST/SCA/DAST và viết code vá lỗi ra sao)."
-    )
+    modes = {
+        "1": {
+            "name": "Pentest & DevSecOps",
+            "icon": "🛡️",
+            "instruction": (
+                "Bạn là Khakhapkhun AI - Chuyên Gia về Kiểm Thử Thâm Nhập (Penetration Testing) và Tự Động Hóa Bảo Mật CI/CD (DevSecOps). "
+                "MỤC TIÊU: Giảng dạy, phân tích và hướng dẫn người dùng bằng TIẾNG VIỆT rõ ràng, dễ hiểu. "
+                "Với mọi chủ đề, hãy phân tích dưới cả hai góc nhìn: Pentester và DevSecOps."
+            )
+        },
+        "2": {
+            "name": "Trading Gold and Coin (Blockchain)",
+            "icon": "📈",
+            "instruction": (
+                "Bạn là Khakhapkhun AI - Chuyên Gia Phân Tích & Cố Vấn Trading Vàng (XAU/USD) và Thị Trường Crypto / Hệ Sinh Thái Blockchain. "
+                "MỤC TIÊU: Cung cấp góc nhìn phân tích thị trường sắc bén, hành động giá (Price Action/SMC), quản trị rủi ro kỷ luật 1-2%, và phân tích công nghệ Blockchain bằng TIẾNG VIỆT."
+            )
+        },
+        "3": {
+            "name": "Learning Dev",
+            "icon": "💻",
+            "instruction": (
+                "Bạn là Khakhapkhun AI - Cố Vấn & Hướng Dẫn Kỹ Thuật Lập Trình Phát Triển Phần Mềm (Software Development Mentor). "
+                "MỤC TIÊU: Đào tạo Fullstack Developer, cấu trúc dữ liệu, giải thuật, Clean Code, SOLID, Design Patterns và kiến trúc phần mềm chuẩn bằng TIẾNG VIỆT."
+            )
+        }
+    }
+
+    selected_mode = "1"
+    for arg in sys.argv[1:]:
+        if arg in ["--mode=1", "--mode=pentest", "-m=1"]:
+            selected_mode = "1"
+        elif arg in ["--mode=2", "--mode=trading", "-m=2"]:
+            selected_mode = "2"
+        elif arg in ["--mode=3", "--mode=dev", "-m=3"]:
+            selected_mode = "3"
+
+    mode_info = modes[selected_mode]
+    system_instruction = mode_info["instruction"]
 
     tools = [search_web, calculate, write_file, read_file, list_files]
 
@@ -119,7 +151,7 @@ def main():
         print("❌ Không thể khởi tạo với bất kỳ Free Model nào.")
         sys.exit(1)
 
-    print(f"\n🛡️ Khakhapkhun AI Pentest & DevSecOps đã sẵn sàng! (Mô hình: {current_model})")
+    print(f"\n{mode_info['icon']} Khakhapkhun AI [{mode_info['name']}] đã sẵn sàng! (Mô hình: {current_model})")
     print("Gõ 'exit' hoặc 'thoat' để thoát.\n" + "-" * 55)
     while True:
         try:

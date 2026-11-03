@@ -1,7 +1,7 @@
 import http from "http";
 import fs from "fs/promises";
 import path from "path";
-import { AIAgent } from "./agent.mjs";
+import { AIAgent, AGENT_MODES } from "./agent.mjs";
 import { learnFromDocument } from "./knowledgeTools.mjs";
 
 const PORT = process.env.PORT || 3000;
@@ -54,17 +54,31 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // 2. API Chat (/api/chat)
+  // 2. API Modes list (/api/modes)
+  if (req.method === "GET" && parsedUrl.pathname === "/api/modes") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({
+      activeMode: agent.mode,
+      modes: AGENT_MODES
+    }));
+    return;
+  }
+
+  // 3. API Chat (/api/chat)
   if (req.method === "POST" && parsedUrl.pathname === "/api/chat") {
     let body = "";
     req.on("data", chunk => body += chunk);
     req.on("end", async () => {
       try {
-        const { message } = JSON.parse(body || "{}");
+        const { message, mode } = JSON.parse(body || "{}");
         if (!message) {
           res.writeHead(400, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ error: "Message is required." }));
           return;
+        }
+
+        if (mode && mode !== agent.mode && AGENT_MODES[mode]) {
+          agent.setMode(mode);
         }
 
         const initialHistoryLength = agent.history.length;
@@ -87,21 +101,46 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify({
           response: responseText,
           activeModel: agent.activeModel,
+          activeMode: agent.mode,
+          activeModeConfig: AGENT_MODES[agent.mode],
           toolCalls
         }));
       } catch (err) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: err.message, activeModel: agent.activeModel }));
+        res.end(JSON.stringify({
+          error: err.message,
+          activeModel: agent.activeModel,
+          activeMode: agent.mode
+        }));
       }
     });
     return;
   }
 
-  // 3. API Reset Conversation (/api/reset)
+  // 4. API Reset / Switch Mode (/api/reset)
   if (req.method === "POST" && parsedUrl.pathname === "/api/reset") {
-    agent.history = [];
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ success: true, message: "Chat history cleared." }));
+    let body = "";
+    req.on("data", chunk => body += chunk);
+    req.on("end", () => {
+      try {
+        const { mode } = JSON.parse(body || "{}");
+        agent.history = [];
+        if (mode && AGENT_MODES[mode]) {
+          agent.setMode(mode);
+        }
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({
+          success: true,
+          message: "Chat history cleared.",
+          activeMode: agent.mode,
+          activeModeConfig: AGENT_MODES[agent.mode]
+        }));
+      } catch (err) {
+        agent.history = [];
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, message: "Chat history cleared.", activeMode: agent.mode }));
+      }
+    });
     return;
   }
 

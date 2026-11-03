@@ -27,16 +27,14 @@ const DEFAULT_MODELS = [
 ];
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
-class AIAgent {
-  constructor(apiKey) {
-    this.apiKey = apiKey;
-    this.history = [];
-    this.activeModel = DEFAULT_MODELS[0];
-    this.modelIndex = 0;
-    this.systemInstruction = {
-      parts: [
-        {
-          text: `Bạn là Khakhapkhun AI - Chuyên Gia về Kiểm Thử Thâm Nhập (Penetration Testing) và Tự Động Hóa Bảo Mật CI/CD (DevSecOps).
+const AGENT_MODES = {
+  pentest: {
+    id: "pentest",
+    name: "Gia sư Pentest & DevSecOps",
+    icon: "🛡️",
+    badge: "Mode 1: Pentest & DevSecOps",
+    description: "Chuyên gia đào tạo Kiểm thử thâm nhập (Offensive Pentest), Tự động hóa an toàn DevSecOps (Shift-Left) và tích hợp công cụ Kali Linux.",
+    systemInstructionText: `Bạn là Khakhapkhun AI - Chuyên Gia về Kiểm Thử Thâm Nhập (Penetration Testing) và Tự Động Hóa Bảo Mật CI/CD (DevSecOps).
 MỤC TIÊU: Đào tạo người dùng trở thành chuyên gia về cả Tấn công đạo đức (Ethical Hacking / Pentest) và Phòng thủ tự động hóa (DevOps & DevSecOps).
 
 NGÔN NGỮ BẮT BUỘC:
@@ -60,18 +58,107 @@ Các trụ cột kiến thức chính:
      b) Góc nhìn DevSecOps: Kỹ sư bảo mật cấu hình quy tắc quét tự động (SAST/SCA/DAST gate) và viết bản vá code an toàn ra sao để ngăn chặn triệt để.
 
 4. Công cụ hỗ trợ:
-   - listCurriculumTracks: Xem danh sách các track học tập.
-   - getCurriculumLesson: Lấy bài học chi tiết theo module (ví dụ: pt-101, pt-102, secops-201, secops-202, cloud-301).
-   - auditCodeSnippet: Kiểm tra bảo mật mã nguồn hoặc Dockerfile.
-   - listKaliTools: Liệt kê danh mục các công cụ trong Kali Linux, hướng dẫn sử dụng và lệnh thực thi mẫu.
+   - listCurriculumTracks, getCurriculumLesson, auditCodeSnippet, listKaliTools.
    - runNmapScan, runNiktoScan, runSqlmapScan, runDirbScan, runGobusterScan, runMetasploitScan, runWhatWebScan, runDnsLookup, runWfuzzScan, runKaliCommand.
-   - learnFromDocument: Học và phân tích tài liệu người dùng tải lên (PDF, DOCX, TXT, MD, YAML, JSON, CSV).
-   - queryLearnedDocuments: Tra cứu kiến thức trong các tài liệu đã học.
-   - learnLatestThreats, getStoredThreatIntel.
-   - searchWeb, writeFile, readFile, listFiles, calculate.`,
-        },
-      ],
+   - learnFromDocument, queryLearnedDocuments, learnLatestThreats, getStoredThreatIntel.
+   - searchWeb, writeFile, readFile, listFiles, calculate.`
+  },
+  trading: {
+    id: "trading",
+    name: "Trading Gold and Coin (Blockchain)",
+    icon: "📈",
+    badge: "Mode 2: Trading Gold & Coin",
+    description: "Chuyên gia phân tích kỹ thuật, hành động giá (Price Action), kinh tế vĩ mô Vàng (XAU/USD) và công nghệ / thị trường Crypto Blockchain.",
+    systemInstructionText: `Bạn là Khakhapkhun AI - Chuyên Gia Phân Tích & Cố Vấn Trading Vàng (XAU/USD) và Thị Trường Crypto / Hệ Sinh Thái Blockchain.
+MỤC TIÊU: Cung cấp góc nhìn phân tích thị trường sắc bén, đào tạo phương pháp giao dịch theo hệ thống, quản trị rủi ro chuyên nghiệp và phân tích công nghệ Blockchain chuyên sâu.
+
+NGÔN NGỮ BẮT BUỘC:
+- Trả lời và giải thích bằng TIẾNG VIỆT (Vietnamese). Giữ nguyên các thuật ngữ chuyên ngành quốc tế kèm giải thích rõ ràng (ví dụ: Price Action, Order Block, FVG, Stop-Loss, Take-Profit, Risk-Reward, On-Chain, Halving, Gas Fee, DeFi, Liquidity).
+
+Các trụ cột kiến thức chính:
+1. Giao dịch Vàng Thế Giới (XAU/USD):
+   - Phân tích kỹ thuật (Technical Analysis): Hành động giá (Price Action), Smart Money Concepts (SMC: Order Block, Imbalance/Fair Value Gap, Liquidity Sweep, Break of Structure / Change of Character), Kháng cự/Hỗ trợ, Đa khung thời gian (D1/H4/H1/M15).
+   - Phân tích cơ bản & Vĩ mô: Chỉ số sức mạnh đồng USD (DXY), Chính sách lãi suất Fed (FOMC), Lạm phát (CPI, PPI), Báo cáo việc làm (Non-Farm Payrolls - NFP), Lợi suất trái phiếu chính phủ Mỹ (US10Y), Dòng tiền trú ẩn an toàn (Safe-Haven) khi có xung đột địa chính trị.
+
+2. Thị trường Crypto & Công nghệ Blockchain:
+   - Cấu trúc thị trường Crypto: Chu kỳ 4 năm gắn liền Bitcoin Halving, Tương quan giữa Bitcoin (BTC) và Altcoins, Chỉ số BTC Dominance (BTC.D), Vốn hóa thị trường Total / Total2 / Total3.
+   - Phân tích On-Chain & Tokenomics: Theo dõi ví cá mập (Whale tracking), Dòng tiền ròng nạp/rút sàn giao dịch (Exchange Netflow), Lịch mở khóa token (Vesting/Cliff/Linear unlock), Lạm phát và cơ chế đốt token (Burn).
+   - Kiến trúc Blockchain & Web3: Cơ chế đồng thuận (Proof of Work vs Proof of Stake), Máy ảo EVM, Mạng Layer 1 (Ethereum, Solana, BNB Chain) vs Layer 2 (Rollups, Arbitrum, Optimism), Hợp đồng thông minh (Smart Contract), Sàn phi tập trung (DEX: Uniswap, PancakeSwap) vs Tập trung (CEX: Binance, Bybit), An toàn bảo mật ví lạnh & ví nóng.
+
+3. Quản Trị Rủi Ro & Kỷ Luật Thép (Risk Management):
+   - NGUYÊN TẮC BẤT DI BẤT DỊCH: Luôn luôn có Stop-Loss (Cắt lỗ) trước khi vào lệnh. Tuyệt đối không gồng lỗ, không All-in, không nhồi lệnh khi giá đang lỗ (Averaging down).
+   - Quản lý vốn: Chỉ mạo hiểm tối đa 1% - 2% tài khoản cho mỗi giao dịch (sử dụng công cụ calculatePositionSize).
+   - Tỷ lệ Lời/Lỗ (R:R): Chỉ vào lệnh khi R:R tối thiểu đạt 1:1.5 hoặc 1:2 trở lên (sử dụng công cụ analyzeRiskReward).
+   - Kiểm soát tâm lý: Nhận diện và vượt qua các cạm bẫy FOMO (sợ bỏ lỡ), Revenge Trading (trả thù thị trường), Overtrading (vào lệnh liên tục).
+
+4. Công cụ hỗ trợ:
+   - calculatePositionSize: Tính khối lượng lot vàng hoặc số coin theo quy tắc quản lý vốn 1-2%.
+   - analyzeRiskReward: Đánh giá tỷ lệ Risk:Reward và thẩm định kèo.
+   - calculateFibonacciLevels: Đo các mốc thoái lui (0.5, 0.618 Golden Pocket) và mở rộng chốt lời.
+   - getCryptoMarketOverview: Tra cứu giá top coin (BTC, ETH, SOL, BNB...) và các chỉ số thị trường.
+   - searchWeb: Tìm kiếm tin tức kinh tế vĩ mô, lịch công bố tin tức, tin tức Crypto mới nhất.
+   - learnFromDocument, queryLearnedDocuments: Đọc tài liệu, sách trading, whitepaper PDF/Word.`
+  },
+  dev: {
+    id: "dev",
+    name: "Learning Dev (Lập trình & Kiến trúc)",
+    icon: "💻",
+    badge: "Mode 3: Learning Dev",
+    description: "Cố vấn và hướng dẫn lập trình phần mềm Fullstack, cấu trúc dữ liệu, giải thuật, Clean Code & Architecture.",
+    systemInstructionText: `Bạn là Khakhapkhun AI - Cố Vấn & Hướng Dẫn Kỹ Thuật Lập Trình Phát Triển Phần Mềm (Software Development Mentor).
+MỤC TIÊU: Đào tạo và hỗ trợ người dùng trở thành kỹ sư phần mềm xuất sắc (Fullstack Developer & Software Architect) với tư duy viết code sạch, kiến trúc hệ thống chuẩn và kỹ năng giải quyết vấn đề thực tế.
+
+NGÔN NGỮ BẮT BUỘC:
+- Trả lời, hướng dẫn, giải thích code bằng TIẾNG VIỆT (Vietnamese). Thuật ngữ kỹ thuật giữ nguyên tiếng Anh rõ ràng (Clean Code, Refactoring, SOLID, Design Patterns, Data Structures, Algorithms, Indexing, CI/CD).
+
+Các trụ cột kiến thức chính:
+1. Cấu Trúc Dữ Liệu & Giải Thuật (DSA) và Tư Duy Logic:
+   - Mảng (Array), Danh sách liên kết (Linked List), Ngăn xếp (Stack), Hàng đợi (Queue), Bảng băm (Hash Map / Hash Set), Cây nhị phân (Binary Tree / BST), Đồ thị (Graph), Đống (Heap).
+   - Kỹ thuật giải thuật: Đệ quy, Hai con trỏ (Two Pointers), Cửa sổ trượt (Sliding Window), Tìm kiếm nhị phân (Binary Search), Sắp xếp, Quy hoạch động (Dynamic Programming), Quay lui (Backtracking).
+   - Phân tích độ phức tạp thời gian và không gian Big-O (O(1), O(log N), O(N), O(N log N), O(N^2)) bằng công cụ explainAlgorithmComplexity.
+
+2. Kỹ Nghệ Phần Mềm & Thiết Kế Kiến Trúc (Architecture & Best Practices):
+   - Clean Code: Đặt tên biến/hàm theo ý nghĩa, hàm ngắn gọn tập trung vào một nhiệm vụ, loại bỏ lặp code (DRY - Don't Repeat Yourself), KISS, YAGNI.
+   - 5 Nguyên lý SOLID: SRP, OCP, LSP, ISP, DIP trong lập trình OOP/Typescript/Java/Python.
+   - Mẫu thiết kế (Design Patterns): Singleton, Factory, Builder, Observer, Strategy, Decorator, Adapter, Repository Pattern.
+   - Kiến trúc hệ thống: Monolith vs Microservices, Clean Architecture (Hexagonal / Onion), Event-Driven Architecture, Caching (Redis), Message Queues (Kafka, RabbitMQ). Tạo khung bằng generateProjectStructure.
+
+3. Kỹ Năng Lập Trình Fullstack Thực Chiến:
+   - Frontend: JavaScript hiện đại (ES6+), TypeScript, React, Next.js, Vue, Quản lý State (Zustand, Redux, Context), Tối ưu Core Web Vitals, Responsive CSS/Tailwind.
+   - Backend & API: Node.js/Express/NestJS, Python (FastAPI/Django), Go, Java/Spring Boot. Thiết kế RESTful API chuẩn HTTP status, GraphQL, WebSocket realtime, Xác thực JWT & OAuth2.
+   - Cơ sở dữ liệu: Thiết kế quan hệ SQL (PostgreSQL, MySQL, indexing tối ưu câu lệnh EXPLAIN ANALYZE, transaction ACID) và NoSQL (MongoDB, Redis).
+   - Debugging & DevOps: Debug lỗi từng bước (Stack trace, memory leak, race condition), Git flow chuẩn (feature branching, PR review), Dockerize ứng dụng, Viết Unit Test / Integration Test (Jest, Vitest, Pytest).
+
+4. Công cụ hỗ trợ:
+   - explainAlgorithmComplexity: Phân tích độ phức tạp Big-O và tư vấn tối ưu thuật toán.
+   - generateProjectStructure: Tạo cấu trúc thư mục chuẩn Clean Architecture, MVC cho dự án.
+   - auditCodeSnippet: Soát lỗi logic, phát hiện anti-patterns và đề xuất bản vá.
+   - learnFromDocument, queryLearnedDocuments: Đọc tài liệu thư viện, sách lập trình, đặc tả API PDF/Word.
+   - writeFile, readFile, listFiles, calculate, searchWeb.`
+  }
+};
+
+class AIAgent {
+  constructor(apiKey, initialMode = "pentest") {
+    this.apiKey = apiKey;
+    this.history = [];
+    this.activeModel = DEFAULT_MODELS[0];
+    this.modelIndex = 0;
+    this.setMode(initialMode);
+  }
+
+  setMode(modeId) {
+    const validMode = AGENT_MODES[modeId] ? modeId : "pentest";
+    this.mode = validMode;
+    const modeConfig = AGENT_MODES[validMode];
+    this.systemInstruction = {
+      parts: [
+        {
+          text: modeConfig.systemInstructionText
+        }
+      ]
     };
+    return modeConfig;
   }
 
   async callGemini(contents) {
@@ -293,6 +380,59 @@ async function runSelfTest() {
     const kaliCatRes = JSON.parse(await TOOL_HANDLERS.listKaliTools({ keyword: "nmap" }));
     console.log(`${C.green}✓ OK${C.reset} (${kaliCatRes.totalTools} tools found)`);
 
+    // 16. Mode 2: Trading Tools
+    process.stdout.write("  Testing calculatePositionSize (Risk Management)... ");
+    const posRes = JSON.parse(await TOOL_HANDLERS.calculatePositionSize({
+      accountBalance: 10000,
+      riskPercentage: 1,
+      entryPrice: 2700,
+      stopLossPrice: 2680,
+      assetType: "GOLD"
+    }));
+    console.log(`${C.green}✓ OK${C.reset} (${posRes.orderDirection} - ${posRes.recommendation.calculatedPosition})`);
+
+    process.stdout.write("  Testing analyzeRiskReward (R:R Ratio)... ");
+    const rrRes = JSON.parse(await TOOL_HANDLERS.analyzeRiskReward({
+      entryPrice: 90000,
+      stopLossPrice: 88000,
+      takeProfitPrice: 96000
+    }));
+    console.log(`${C.green}✓ OK${C.reset} (${rrRes.rrRatio})`);
+
+    process.stdout.write("  Testing calculateFibonacciLevels... ");
+    const fibRes = JSON.parse(await TOOL_HANDLERS.calculateFibonacciLevels({
+      highPrice: 100000,
+      lowPrice: 60000,
+      trend: "UP"
+    }));
+    console.log(`${C.green}✓ OK${C.reset} (Golden Pocket: ${fibRes.goldenPocket.range})`);
+
+    // 17. Mode 3: Dev Tools
+    process.stdout.write("  Testing explainAlgorithmComplexity (DSA)... ");
+    const algoRes = JSON.parse(await TOOL_HANDLERS.explainAlgorithmComplexity({
+      algorithmName: "QuickSort",
+      timeComplexity: "O(N log N)",
+      spaceComplexity: "O(log N)"
+    }));
+    console.log(`${C.green}✓ OK${C.reset} (${algoRes.name}: ${algoRes.timeComplexity.averageCase})`);
+
+    process.stdout.write("  Testing generateProjectStructure (Clean Architecture)... ");
+    const projRes = JSON.parse(await TOOL_HANDLERS.generateProjectStructure({
+      projectType: "backend",
+      architectureStyle: "clean-architecture"
+    }));
+    console.log(`${C.green}✓ OK${C.reset} (${projRes.architectureStyle})`);
+
+    // 18. Mode Switching
+    process.stdout.write("  Testing AIAgent Mode Switching... ");
+    const testAgent = new AIAgent("TEST_KEY", "pentest");
+    if (testAgent.mode !== "pentest") throw new Error("Initial mode mismatch");
+    testAgent.setMode("trading");
+    if (testAgent.mode !== "trading") throw new Error("Trading mode switch failed");
+    testAgent.setMode("dev");
+    if (testAgent.mode !== "dev") throw new Error("Dev mode switch failed");
+    console.log(`${C.green}✓ OK${C.reset} (3 modes verified: pentest, trading, dev)`);
+
     // Clean up temporary test files
     await (await import("fs/promises")).unlink(sampleDocPath).catch(() => { });
 
@@ -311,9 +451,29 @@ async function main() {
     await runSelfTest();
     return;
   }
-  console.log(`\n${C.green}${C.bold}==============================================${C.reset}`);
-  console.log(`${C.green}${C.bold}   🛡️  Khakhapkhun AI: Pentest & DevSecOps (VN)   ${C.reset}`);
-  console.log(`${C.green}${C.bold}==============================================${C.reset}\n`);
+
+  // Detect mode parameter (--mode=trading / -m dev / etc.)
+  let selectedMode = "pentest";
+  const modeArg = process.argv.find((arg) => arg.startsWith("--mode="));
+  if (modeArg) {
+    selectedMode = modeArg.split("=")[1].toLowerCase();
+  } else {
+    const mIdx = process.argv.indexOf("-m");
+    if (mIdx !== -1 && process.argv[mIdx + 1]) {
+      selectedMode = process.argv[mIdx + 1].toLowerCase();
+    }
+  }
+
+  if (!AGENT_MODES[selectedMode]) {
+    selectedMode = "pentest";
+  }
+
+  const currentModeConfig = AGENT_MODES[selectedMode];
+
+  console.log(`\n${C.green}${C.bold}======================================================${C.reset}`);
+  console.log(`${C.green}${C.bold}   ${currentModeConfig.icon} Khakhapkhun AI: ${currentModeConfig.name}   ${C.reset}`);
+  console.log(`${C.green}${C.bold}   (${currentModeConfig.badge})   ${C.reset}`);
+  console.log(`${C.green}${C.bold}======================================================${C.reset}\n`);
 
   let apiKey = process.env.GEMINI_API_KEY;
 
@@ -331,12 +491,13 @@ async function main() {
     }
   }
 
-  const agent = new AIAgent(apiKey);
+  const agent = new AIAgent(apiKey, selectedMode);
 
   // Check if a single query was passed via command line (e.g. node agent.mjs "What time is it?")
-  const queryArgs = process.argv.slice(2).filter((arg) => !arg.startsWith("-"));
+  const queryArgs = process.argv.slice(2).filter((arg) => !arg.startsWith("-") && !arg.startsWith("--mode="));
   if (queryArgs.length > 0) {
     const singlePrompt = queryArgs.join(" ");
+    console.log(`${C.bold}Chế độ:${C.reset} ${currentModeConfig.badge}`);
     console.log(`${C.bold}Câu hỏi:${C.reset} ${singlePrompt}`);
     console.log(`${C.dim}Mô hình AI: ${agent.activeModel}...${C.reset}`);
     const response = await agent.processUserMessage(singlePrompt);
@@ -345,9 +506,9 @@ async function main() {
     return;
   }
 
-  console.log(`\n${C.green}✓ Khakhapkhun AI đã sẵn sàng! (Mô hình: ${agent.activeModel})${C.reset}`);
-  console.log(`${C.dim}Công cụ: listCurriculumTracks, getCurriculumLesson, auditCodeSnippet, searchWeb, v.v.${C.reset}`);
-  console.log(`${C.dim}Nhập 'exit' hoặc 'quit' để kết thúc buổi học.${C.reset}\n`);
+  console.log(`\n${C.green}✓ Khakhapkhun AI đã sẵn sàng! (Mô hình: ${agent.activeModel} | Chế độ: ${currentModeConfig.badge})${C.reset}`);
+  console.log(`${C.dim}Mẹo: Đổi chế độ bằng cách chạy lại lệnh kèm: --mode=pentest | --mode=trading | --mode=dev${C.reset}`);
+  console.log(`${C.dim}Nhập 'exit' hoặc 'quit' để kết thúc.${C.reset}\n`);
 
   while (true) {
     const prompt = await rl.question(`${C.bold}Bạn: ${C.reset}`);
@@ -355,7 +516,7 @@ async function main() {
 
     if (!trimmed) continue;
     if (["exit", "quit", "q", "thoat"].includes(trimmed.toLowerCase())) {
-      console.log(`\n${C.yellow}Tạm biệt bạn! Hẹn gặp lại trong buổi học tiếp theo! 👋${C.reset}\n`);
+      console.log(`\n${C.yellow}Tạm biệt bạn! Hẹn gặp lại trong phiên làm việc tiếp theo! 👋${C.reset}\n`);
       break;
     }
 
@@ -371,7 +532,7 @@ async function main() {
   rl.close();
 }
 
-export { AIAgent, DEFAULT_MODELS, runSelfTest };
+export { AIAgent, AGENT_MODES, DEFAULT_MODELS, runSelfTest };
 
 // Only run CLI interface if executed directly from command line
 if (process.argv[1] && process.argv[1].endsWith("agent.mjs")) {

@@ -23,6 +23,16 @@ import {
   queryLearnedDocuments,
 } from "./knowledgeTools.mjs";
 import { listKaliTools } from "./kaliToolsCatalog.mjs";
+import {
+  calculatePositionSize,
+  analyzeRiskReward,
+  calculateFibonacciLevels,
+  getCryptoMarketOverview
+} from "./tradingTools.mjs";
+import {
+  explainAlgorithmComplexity,
+  generateProjectStructure
+} from "./devTools.mjs";
 
 /**
  * Tool 1: Safe Math Calculator
@@ -555,6 +565,82 @@ export const TOOL_DECLARATIONS = [
       },
       required: ["targetUrl"]
     }
+  },
+  {
+    name: "calculatePositionSize",
+    description: "Tính toán khối lượng vào lệnh (Position Size / Lot / Coin) theo kỷ luật quản trị rủi ro nghiêm ngặt (chỉ chịu lỗ tối đa 1-2% tài khoản cho mỗi lệnh). Dùng cho Mode Trading Vàng & Coin.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        accountBalance: { type: "NUMBER", description: "Số dư tài khoản (USD)" },
+        riskPercentage: { type: "NUMBER", description: "Tỷ lệ rủi ro chấp nhận cho lệnh này (thường 1% hoặc 2%)" },
+        entryPrice: { type: "NUMBER", description: "Mức giá vào lệnh (Entry)" },
+        stopLossPrice: { type: "NUMBER", description: "Mức giá cắt lỗ (Stop-Loss)" },
+        assetType: { type: "STRING", description: "Loại tài sản: 'CRYPTO', 'GOLD', hoặc 'FOREX'" }
+      },
+      required: ["entryPrice", "stopLossPrice"]
+    }
+  },
+  {
+    name: "analyzeRiskReward",
+    description: "Đánh giá tỷ lệ Lời/Lỗ (Risk to Reward Ratio - R:R) và đưa ra khuyến nghị vào lệnh chuẩn xác.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        entryPrice: { type: "NUMBER", description: "Giá vào lệnh (Entry)" },
+        stopLossPrice: { type: "NUMBER", description: "Giá cắt lỗ (Stop-Loss)" },
+        takeProfitPrice: { type: "NUMBER", description: "Giá chốt lời (Take-Profit)" }
+      },
+      required: ["entryPrice", "stopLossPrice", "takeProfitPrice"]
+    }
+  },
+  {
+    name: "calculateFibonacciLevels",
+    description: "Tính các mốc thoái lui Fibonacci (0.236, 0.382, 0.5, 0.618, 0.786) và các mốc mở rộng (1.272, 1.618) cho sóng tăng hoặc sóng giảm.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        highPrice: { type: "NUMBER", description: "Mức giá cao nhất của con sóng (Swing High)" },
+        lowPrice: { type: "NUMBER", description: "Mức giá thấp nhất của con sóng (Swing Low)" },
+        trend: { type: "STRING", description: "Xu hướng con sóng: 'UP' (Tăng) hoặc 'DOWN' (Giảm)" }
+      },
+      required: ["highPrice", "lowPrice"]
+    }
+  },
+  {
+    name: "getCryptoMarketOverview",
+    description: "Tra cứu tổng quan giá và biến động 24h của các loại tiền mã hóa hàng đầu (BTC, ETH, SOL, BNB...) hoặc phân tích các chỉ số vĩ mô (BTC.D, Fear & Greed).",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        symbols: { type: "STRING", description: "Danh sách ký hiệu coin cách nhau bởi dấu phẩy (vd: 'BTC,ETH,SOL,BNB')" }
+      }
+    }
+  },
+  {
+    name: "explainAlgorithmComplexity",
+    description: "Phân tích và giải thích độ phức tạp thời gian & không gian (Big-O: Best, Average, Worst) của thuật toán hoặc cấu trúc dữ liệu, kèm lời khuyên tối ưu hóa. Dùng cho Mode Learning Dev.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        algorithmName: { type: "STRING", description: "Tên thuật toán hoặc cấu trúc dữ liệu (vd: QuickSort, Binary Search, Hash Table)" },
+        timeComplexity: { type: "STRING", description: "Độ phức tạp thời gian (vd: O(log N), O(N), O(N log N))" },
+        spaceComplexity: { type: "STRING", description: "Độ phức tạp không gian (vd: O(1), O(N))" }
+      },
+      required: ["algorithmName"]
+    }
+  },
+  {
+    name: "generateProjectStructure",
+    description: "Tạo cấu trúc cây thư mục dự án chuẩn công nghiệp theo kiến trúc Clean Architecture, MVC, Hexagonal hoặc Modular cho Backend, Frontend, Microservices.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        projectType: { type: "STRING", description: "Loại dự án: 'backend', 'frontend', hoặc 'fullstack'" },
+        framework: { type: "STRING", description: "Framework (vd: express, nestjs, fastapi, nextjs, react, spring-boot)" },
+        architectureStyle: { type: "STRING", description: "Kiểu kiến trúc: 'clean-architecture', 'mvc', hoặc 'modular'" }
+      }
+    }
   }
 ];
 
@@ -587,5 +673,11 @@ export const TOOL_HANDLERS = {
   queryLearnedDocuments,
   learnLatestThreats,
   getStoredThreatIntel,
+  calculatePositionSize,
+  analyzeRiskReward,
+  calculateFibonacciLevels,
+  getCryptoMarketOverview,
+  explainAlgorithmComplexity,
+  generateProjectStructure,
 };
 
