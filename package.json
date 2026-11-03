@@ -5,8 +5,9 @@
   "type": "module",
   "main": "agent.mjs",
   "scripts": {
-    "start": "node --env-file=.env agent.mjs",
-    "dev": "node agent.mjs",
+    "start": "node --env-file=.env server.mjs",
+    "cli": "node --env-file=.env agent.mjs",
+    "dev": "node --env-file=.env server.mjs",
     "test": "node agent.mjs --test",
     "push": "git add . && git commit -m \"Update AI Agent\" && git push origin main"
   },

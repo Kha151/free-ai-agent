@@ -29,11 +29,22 @@ Mở file [`.env`](.env) và điền key của bạn từ [Google AI Studio](htt
 GEMINI_API_KEY=your_gemini_key_here
 ```
 
-### 2. Chạy Gia Sư AI
-
-**Chế độ Chat trực tiếp (Hỏi đáp & Học tập tương tác):**
+### 2. Chạy Ứng Dụng Web App (Giao diện ChatGPT / Gemini UI)
+Trải nghiệm trực quan với giao diện Web App chuyên nghiệp, hỗ trợ upload file PDF/Word, code highlighting và gọi tool tự động:
 ```powershell
-node --env-file=.env agent.mjs
+npm start
+# Hoặc: node --env-file=.env server.mjs
+```
+👉 Mở trình duyệt tại: **`http://localhost:3000`**
+
+---
+
+### 3. Các Chế Độ Chạy Khác
+
+**Chế độ Terminal CLI:**
+```powershell
+npm run cli
+# Hoặc: node --env-file=.env agent.mjs
 ```
 
 **Đặt câu hỏi nhanh qua dòng lệnh (CLI):**

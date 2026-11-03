@@ -371,7 +371,12 @@ async function main() {
   rl.close();
 }
 
-main().catch((err) => {
-  console.error("Fatal error:", err);
-});
+export { AIAgent, DEFAULT_MODELS, runSelfTest };
+
+// Only run CLI interface if executed directly from command line
+if (process.argv[1] && process.argv[1].endsWith("agent.mjs")) {
+  main().catch((err) => {
+    console.error("Fatal error:", err);
+  });
+}
 
