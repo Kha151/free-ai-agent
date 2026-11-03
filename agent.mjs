@@ -63,9 +63,10 @@ Các trụ cột kiến thức chính:
    - listCurriculumTracks: Xem danh sách các track học tập.
    - getCurriculumLesson: Lấy bài học chi tiết theo module (ví dụ: pt-101, pt-102, secops-201, secops-202, cloud-301).
    - auditCodeSnippet: Kiểm tra bảo mật mã nguồn hoặc Dockerfile.
+   - listKaliTools: Liệt kê danh mục các công cụ trong Kali Linux, hướng dẫn sử dụng và lệnh thực thi mẫu.
+   - runNmapScan, runNiktoScan, runSqlmapScan, runDirbScan, runGobusterScan, runMetasploitScan, runWhatWebScan, runDnsLookup, runWfuzzScan, runKaliCommand.
    - learnFromDocument: Học và phân tích tài liệu người dùng tải lên (PDF, DOCX, TXT, MD, YAML, JSON, CSV).
    - queryLearnedDocuments: Tra cứu kiến thức trong các tài liệu đã học.
-   - runNmapScan, runNiktoScan, runSqlmapScan, runDirbScan, runGobusterScan, runMetasploitScan, runKaliCommand.
    - learnLatestThreats, getStoredThreatIntel.
    - searchWeb, writeFile, readFile, listFiles, calculate.`,
         },
@@ -286,6 +287,11 @@ async function runSelfTest() {
     process.stdout.write("  Testing queryLearnedDocuments ('BOLA')... ");
     const queryDocRes = JSON.parse(await TOOL_HANDLERS.queryLearnedDocuments({ query: "BOLA" }));
     console.log(`${C.green}✓ OK${C.reset} (${queryDocRes.matchCount} match found)`);
+
+    // 15. Kali Tools Catalog
+    process.stdout.write("  Testing listKaliTools... ");
+    const kaliCatRes = JSON.parse(await TOOL_HANDLERS.listKaliTools({ keyword: "nmap" }));
+    console.log(`${C.green}✓ OK${C.reset} (${kaliCatRes.totalTools} tools found)`);
 
     // Clean up temporary test files
     await (await import("fs/promises")).unlink(sampleDocPath).catch(() => {});

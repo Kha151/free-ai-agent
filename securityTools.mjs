@@ -449,6 +449,36 @@ export async function runKaliCommand({ command }) {
   return await runToolInKali(safeCmd, "Kali Shell");
 }
 
+/**
+ * 11. WhatWeb – nhận diện công nghệ web mục tiêu
+ */
+export async function runWhatWebScan({ targetUrl = "http://127.0.0.1", aggression = "3" }) {
+  const safeUrl = targetUrl.replace(/[`$\\]/g, "");
+  const safeAgg = aggression.replace(/[^1-4]/g, "") || "3";
+  const cmd = `whatweb -a ${safeAgg} ${safeUrl}`;
+  return await runToolInKali(cmd, "WhatWeb");
+}
+
+/**
+ * 12. DNS Lookup (dig / nslookup)
+ */
+export async function runDnsLookup({ domain = "localhost", type = "ANY" }) {
+  const safeDomain = domain.replace(/[^a-zA-Z0-9.\-_]/g, "");
+  const safeType = type.replace(/[^a-zA-Z]/g, "") || "A";
+  const cmd = `dig ${safeDomain} ${safeType} +noall +answer`;
+  return await runToolInKali(cmd, "Dig DNS");
+}
+
+/**
+ * 13. Wfuzz – Fuzzing tham số web HTTP
+ */
+export async function runWfuzzScan({ targetUrl = "http://127.0.0.1/FUZZ", wordlist = "/usr/share/wordlists/dirb/common.txt" }) {
+  const safeUrl = targetUrl.replace(/[`$\\]/g, "");
+  const safeWl = wordlist.replace(/[`$\\]/g, "");
+  const cmd = `wfuzz -c -z file,${safeWl} --hc 404 ${safeUrl}`;
+  return await runToolInKali(cmd, "Wfuzz");
+}
+
 // Helpers
 async function getFilesRecursively(dir) {
   let results = [];

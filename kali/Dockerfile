@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gobuster \
     whatweb \
     wfuzz \
+    hydra \
+    netcat-traditional \
     curl \
     wget \
     git \
@@ -33,3 +35,4 @@ WORKDIR /home/$USERNAME
 
 # Container luôn chạy (để Agent có thể exec vào)
 CMD ["sleep", "infinity"]
+

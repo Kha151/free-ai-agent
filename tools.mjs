@@ -12,6 +12,9 @@ import {
   runGobusterScan,
   runMetasploitScan,
   runKaliCommand,
+  runWhatWebScan,
+  runDnsLookup,
+  runWfuzzScan,
 } from "./securityTools.mjs";
 import {
   learnLatestThreats,
@@ -19,6 +22,7 @@ import {
   learnFromDocument,
   queryLearnedDocuments,
 } from "./knowledgeTools.mjs";
+import { listKaliTools } from "./kaliToolsCatalog.mjs";
 
 /**
  * Tool 1: Safe Math Calculator
@@ -504,6 +508,53 @@ export const TOOL_DECLARATIONS = [
         query: { type: "STRING", description: "Từ khóa tìm kiếm trong cơ sở tri thức (tên CVE, tên package, mô tả)" }
       }
     }
+  },
+  {
+    name: "listKaliTools",
+    description: "Liệt kê danh mục toàn bộ các công cụ Pentest trong Kali Linux, mục đích, cú pháp lệnh thực thi mẫu và hướng dẫn phòng thủ DevSecOps.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        category: { type: "STRING", description: "Lọc theo danh mục: Reconnaissance, Web, Exploitation, DNS, Database..." },
+        keyword: { type: "STRING", description: "Từ khóa tìm kiếm theo tên tool hoặc chức năng (vd: nmap, sqlmap, brute-force...)" }
+      }
+    }
+  },
+  {
+    name: "runWhatWebScan",
+    description: "Chạy WhatWeb trong Kali để nhận diện công nghệ web: CMS, Web Server, Frameworks và Plugins.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        targetUrl: { type: "STRING", description: "URL mục tiêu cần nhận diện công nghệ" },
+        aggression: { type: "STRING", description: "Mức độ quét (1: Stealthy, 3: Aggressive, 4: Heavy), mặc định là 3" }
+      },
+      required: ["targetUrl"]
+    }
+  },
+  {
+    name: "runDnsLookup",
+    description: "Thực hiện truy vấn DNS bằng dig trong Kali Linux để kiểm tra bản ghi A, MX, TXT, NS hoặc Zone Transfer.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        domain: { type: "STRING", description: "Tên miền cần truy vấn (vd: example.com)" },
+        type: { type: "STRING", description: "Loại bản ghi DNS (A, MX, TXT, NS, ANY, AXFR), mặc định ANY" }
+      },
+      required: ["domain"]
+    }
+  },
+  {
+    name: "runWfuzzScan",
+    description: "Chạy Wfuzz trong Kali để fuzzing tham số HTTP GET/POST hoặc đường dẫn ẩn.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        targetUrl: { type: "STRING", description: "URL chứa từ khóa FUZZ (vd: http://example.com/FUZZ hoặc http://example.com/?id=FUZZ)" },
+        wordlist: { type: "STRING", description: "Đường dẫn wordlist trong Kali (mặc định /usr/share/wordlists/dirb/common.txt)" }
+      },
+      required: ["targetUrl"]
+    }
   }
 ];
 
@@ -528,6 +579,10 @@ export const TOOL_HANDLERS = {
   runGobusterScan,
   runMetasploitScan,
   runKaliCommand,
+  runWhatWebScan,
+  runDnsLookup,
+  runWfuzzScan,
+  listKaliTools,
   learnFromDocument,
   queryLearnedDocuments,
   learnLatestThreats,
